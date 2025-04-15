@@ -18,18 +18,16 @@ export default function TabSettingScreen() {
     async function attemptDisconnect()
     {
         await SecureStore.deleteItemAsync('token')
-        router.push('/(auth)')
+        router.push('/auth')
     }
 
     return (
         <ParallaxScrollView
             headerBackgroundColor={{ light: '#D0D0D0', dark: '#353636' }}
             headerImage={
-                <IconSymbol
-                    size={310}
-                    color="#808080"
-                    name="chevron.left.forwardslash.chevron.right"
-                    style={styles.headerImage}
+                <Image
+                    source={require('@/assets/images/coffee.png')}
+                    style={styles.reactLogo}
                 />
             }
         >
@@ -68,22 +66,26 @@ export default function TabSettingScreen() {
                 })}
             </Collapsible>
 
-        <Button title="Se déconnecter" onPress={() => attemptDisconnect()} />
+        <Button title="Se déconnecter" color="#841584" onPress={() => attemptDisconnect()} />
 
     </ParallaxScrollView>
   );
 }
 
 const styles = StyleSheet.create({
-  headerImage: {
-    color: '#808080',
-    bottom: -90,
-    left: -35,
-    position: 'absolute',
-  },
-  titleContainer: {
-    flexDirection: 'row',
-    gap: 8,
-  },
+    headerImage: {
+        color: '#808080',
+        bottom: -90,
+        left: -35,
+        position: 'absolute',
+    },
+    reactLogo: {
+        width: '100%',
+        height: '100%',
+    },
+    titleContainer: {
+        flexDirection: 'row',
+        gap: 8,
+    },
 });
 

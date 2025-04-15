@@ -11,8 +11,8 @@ import { useRouter } from "expo-router";
 
 export default function AuthScreen() {
 
-    const [email, setEmail] = React.useState('');
-    const [password, setPassword] = React.useState('');
+    const [email, setEmail] = React.useState('guest@cda.fr');
+    const [password, setPassword] = React.useState('cda');
 
     const router = useRouter();
 
@@ -30,7 +30,7 @@ export default function AuthScreen() {
     async function attemptConnexion()
     {
         try{
-            alert(email + " / " + password);
+            // alert(email + " / " + password);
 
             const ids = {
                 email: email,
@@ -79,13 +79,13 @@ export default function AuthScreen() {
           <ThemedView style={styles.stepContainer}>
               <TextInput
                   onChangeText={(text) => setEmail(text)}
-                  value={email}
+                  value="guest@cda.fr"
                   placeholder="Enter login"
               />
 
               <TextInput
                   onChangeText={(text) => setPassword(text)}
-                  value={password}
+                  value="cda"
                   placeholder="Enter password"
                   secureTextEntry={true}
               />

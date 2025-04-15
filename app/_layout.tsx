@@ -9,15 +9,34 @@ import 'react-native-reanimated';
 import '../global.css';
 
 import { useColorScheme } from '@/hooks/useColorScheme';
+import * as Notifications from "expo-notifications";
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
+
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowAlert: true,
+    shouldPlaySound: false,
+    shouldSetBadge: false,
+  }),
+});
 
 export default function RootLayout() {
   const colorScheme = useColorScheme();
   const [loaded] = useFonts({
     SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
   });
+
+  useEffect(() => {
+    const requestPermissions = async () => {
+      const { status } = await Notifications.requestPermissionsAsync();
+      if (status !== 'granted') {
+        alert('Permission de notifications refusée');
+      }
+    };
+    requestPermissions();
+  }, []);
 
   useEffect(() => {
     if (loaded) {
@@ -32,10 +51,13 @@ export default function RootLayout() {
   return (
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
       <Stack screenOptions={{ headerShown: false }}>
-        <Stack.Screen name="(auth)" />
-        {/*<Stack.Screen name="(tabs)" options={{ headerShown: false }} />*/}
+
+        <Stack.Screen name="auth" />
         <Stack.Screen name="+not-found" />
+
+        <Stack.Screen name="[productId]" options={{ headerShown: true }}/>
       </Stack>
+
       <StatusBar style="auto" />
     </ThemeProvider>
   );
