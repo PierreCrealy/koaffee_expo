@@ -22,6 +22,7 @@ import React, {useCallback, useEffect} from "react";
 import ProductCard from "@/components/ProductCard";
 import {StatusBar} from "expo-status-bar";
 import { Product } from "@/entities/Product";
+import { User } from "@/entities/User";
 import * as SplashScreen from "expo-splash-screen";
 import CartSection from "@/components/CartSection";
 import CategorySection from "@/components/CategorySection";
@@ -32,6 +33,8 @@ export default function HomeScreen() {
     const [cartProducts, setCartProducts] = React.useState<Product[]>([]);
     const [products, setProducts] = React.useState<Product[]>([]);
     const [categories, setCategories] = React.useState<string[]>([]);
+
+    const [user, setUser] = React.useState<User>();
 
     const sendNotification = async () => {
         await Notifications.scheduleNotificationAsync({
@@ -82,6 +85,18 @@ export default function HomeScreen() {
     }
 
 
+    useEffect(() => {
+        const loadUser = async () => {
+            const token = await SecureStore.getItemAsync('userToken');
+            const userInfo = await SecureStore.getItemAsync('userInfo');
+            const userSec = JSON.parse(userInfo);
+
+            setUser(userSec);
+        }
+
+        loadUser();
+    }, []);
+
     return (
         <ParallaxScrollView
             headerBackgroundColor={{light: '#A1CEDC', dark: '#1D3D47'}}
@@ -92,7 +107,7 @@ export default function HomeScreen() {
                 />
             }>
             <ThemedView style={styles.titleContainer}>
-                <ThemedText type="title">Bienvenue !</ThemedText>
+                <ThemedText type="title">Bienvenue {user?.name}</ThemedText>
                 <HelloWave/>
             </ThemedView>
 

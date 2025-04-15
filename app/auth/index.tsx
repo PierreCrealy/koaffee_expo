@@ -50,7 +50,9 @@ export default function AuthScreen() {
 
             const data = await response.json()
 
-            await SecureStore.setItemAsync('token', data.success.token)
+            await SecureStore.setItemAsync('userToken', data.success.token)
+            // @ts-ignore
+            await SecureStore.setItemAsync('userInfo', JSON.stringify({ name: data.success.name, email: data.success.email }))
 
             // alert("Store token : " + await SecureStore.getItemAsync('token'))
             // alert('Connexion réussi.')

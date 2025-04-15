@@ -53,18 +53,18 @@ export default function HomeScreen() {
                 <ThemedText type="title">{ product?.name }</ThemedText>
                 <Text style={styles.dateText}>{FormatDate(product?.created_at)}</Text>
                 {product?.updated_at !== product?.created_at && (
-                    <Text style={styles.dateText}>formatDate(product.updated_at)</Text>
+                    <Text style={styles.dateText}>{FormatDate(product?.updated_at)}</Text>
                 )}
             </ThemedView>
 
             <View style={styles.details}>
-                {product?.fidelity_program && (
+                {Boolean(product?.fidelity_program) && (
                     <View style={styles.badge}>
                         <Text style={styles.badgeText}>Loyalty Program</Text>
                     </View>
                 )}
 
-                {product?.proposed && (
+                {Boolean(product?.proposed) && (
                     <View style={[styles.badge, styles.proposedBadge]}>
                         <Text style={styles.badgeText}>Available</Text>
                     </View>

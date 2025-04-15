@@ -10,7 +10,7 @@ export default function ProductCard ({ product }: {product: Product}) {
 
     return (
         <TouchableOpacity style={styles.card}>
-            {product.highlight && (
+            {Boolean(product.highlight) && (
                 <View style={styles.highlightBadge}>
                     <Text style={styles.highlightText}>Featured</Text>
                 </View>
@@ -30,13 +30,13 @@ export default function ProductCard ({ product }: {product: Product}) {
                     <Text style={styles.category}>{product.category}</Text>
 
                     <View style={styles.details}>
-                        {product.fidelity_program && (
+                        {Boolean(product.fidelity_program) && (
                             <View style={styles.badge}>
                                 <Text style={styles.badgeText}>Loyalty Program</Text>
                             </View>
                         )}
 
-                        {product.proposed && (
+                        {Boolean(product.proposed) && (
                             <View style={[styles.badge, styles.proposedBadge]}>
                                 <Text style={styles.badgeText}>Available</Text>
                             </View>
@@ -49,10 +49,10 @@ export default function ProductCard ({ product }: {product: Product}) {
             <View style={styles.footer}>
                 <Text style={styles.dateText}>{FormatDate(product.created_at)}</Text>
                 {product.updated_at !== product.created_at && (
-                    <Text style={styles.dateText}>formatDate(product.updated_at)</Text>
+                    <Text style={styles.dateText}>{FormatDate(product.updated_at)}</Text>
                 )}
-                <Text style={styles.price}>{product.price} €</Text>
-                <Link href={{pathname: '/product/[productId]', params: {productId: product.id}}}> Détails </Link>
+                <Text style={styles.price}>{product.price}</Text>
+                <Link href={{pathname: '/product/[productId]', params: {productId: product.id}}}> <Text style={{ color: 'blue' }}> Détails </Text> </Link>
             </View>
         </TouchableOpacity>
     )
