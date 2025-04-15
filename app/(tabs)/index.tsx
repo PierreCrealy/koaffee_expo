@@ -23,12 +23,15 @@ import ProductCard from "@/components/ProductCard";
 import {StatusBar} from "expo-status-bar";
 import { Product } from "@/entities/Product";
 import * as SplashScreen from "expo-splash-screen";
+import CartSection from "@/components/CartSection";
+import CategorySection from "@/components/CategorySection";
 
 
 export default function HomeScreen() {
 
     const [cartProducts, setCartProducts] = React.useState<Product[]>([]);
     const [products, setProducts] = React.useState<Product[]>([]);
+    const [categories, setCategories] = React.useState<string[]>([]);
 
     const sendNotification = async () => {
         await Notifications.scheduleNotificationAsync({
@@ -42,18 +45,26 @@ export default function HomeScreen() {
     };
 
     useEffect(() => {
-         const fetchProducts = async () => {
-             fetch('https://pass-api.pierre-dev-app.fr/api/v1/product')
-                 .then((response) => response.json())
-                 .then(data => {
-                     setProducts(data.products);
-                     // sendNotification();
-                 })
-                 .catch((e) => alert('error : ' + e.message));
-         }
+        const fetchProducts = async () => {
+            fetch('https://pass-api.pierre-dev-app.fr/api/v1/product')
+                .then((response) => response.json())
+                .then(data => {
+                    setProducts(data.products);
+                    // sendNotification();
+                })
+                .catch((e) => alert('error : ' + e.message));
+        }
 
-         fetchProducts();
+        fetchProducts();
     }, []);
+
+    useEffect(() => {
+        const cat = products.map((product) => product.category);
+        const uniqueCat = [...new Set(cat)];
+
+        // @ts-ignore
+        setCategories(uniqueCat)
+    }, [products]);
 
     async function fetchExchange() {
         const response = await fetch('https://pass-api.pierre-dev-app.fr/api/v1/exchange/1');
@@ -87,16 +98,13 @@ export default function HomeScreen() {
 
 
             <ThemedView style={styles.stepContainer}>
-                <ThemedText type="subtitle">Panier</ThemedText>
-                <FlatList
-                    scrollEnabled={false}
-                    data={cartProducts}
-                    keyExtractor={(item, index) => index.toString()}
-                    renderItem={({item}) =>
-                        <Text onPress={() => removeCartProduct(item)}> {item.name} </Text>
-                    }
-                />
+                <CartSection products={cartProducts} />
             </ThemedView>
+
+            <ThemedView style={styles.stepContainer}>
+                <CategorySection categories={categories} />
+            </ThemedView>
+
 
             <ThemedView>
                 <FlatList
@@ -105,17 +113,19 @@ export default function HomeScreen() {
                     keyExtractor={(item) => item.id.toString()}
                     renderItem={({ item }) =>
                         (
-                            <View>
-                                <TouchableOpacity style={styles.addBtn} onPress={() => addCartProduct(item)}>
-                                    <Text style={styles.textBtn}>Ajouter au panier</Text>
-                                </TouchableOpacity>
+                            <View style={styles.itemProduct}>
                                 <ProductCard product={item} />
+                                <View style={styles.actionItemProduct}>
+                                    <TouchableOpacity style={styles.addBtn} onPress={() => addCartProduct(item)}>
+                                        <Text style={styles.textBtn}>Ajouter +</Text>
+                                    </TouchableOpacity>
+                                </View>
                             </View>
 
                         )}
                     contentContainerStyle={styles.list}
                     // refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={["#f4511e"]} />}
-                    ListEmptyComponent={<Text style={styles.emptyText}>No products available</Text>}
+                    ListEmptyComponent={<Text style={styles.emptyText}>Aucun produit disponible</Text>}
                 />
             </ThemedView>
 
@@ -130,6 +140,11 @@ const styles = StyleSheet.create({
         gap: 8,
     },
     stepContainer: {
+        gap: 8,
+        marginBottom: 8,
+    },
+    cartContainer: {
+        height: 50,
         gap: 8,
         marginBottom: 8,
     },
@@ -166,15 +181,9 @@ const styles = StyleSheet.create({
         position: 'absolute',
     },
     addBtn: {
-        zIndex: 1,
-
-        position: 'absolute',
-        right: 0,
-        top: -10,
-
-        backgroundColor: '#A1CEDC',
+        backgroundColor: '#F5F5F5',
         paddingVertical: 8,
-        paddingHorizontal: 8,
+        paddingHorizontal: 16,
         borderRadius: 8,
 
         elevation: 3,
@@ -182,9 +191,17 @@ const styles = StyleSheet.create({
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.8,
         shadowRadius: 2,
+
+        marginTop: 10,
+    },
+    itemProduct: {
+        marginBottom: 40,
+    },
+    actionItemProduct: {
+        alignItems: 'flex-end',
     },
     textBtn: {
-        fontSize: 13,
+        fontSize: 15,
         textAlign: 'center',
         fontWeight: 'bold',
     },

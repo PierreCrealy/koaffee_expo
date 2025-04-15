@@ -1,7 +1,8 @@
-import { StyleSheet, View, Text, TouchableOpacity } from "react-native"
+import { StyleSheet, View, Text, TouchableOpacity, Image} from "react-native"
 import { Product } from "@/entities/Product";
 import { Link, useRouter } from "expo-router";
 import { FormatDate } from "@/usefuls/FormatDate";
+import React from "react";
 
 export default function ProductCard ({ product }: {product: Product}) {
 
@@ -15,33 +16,42 @@ export default function ProductCard ({ product }: {product: Product}) {
                 </View>
             )}
 
-            <View style={styles.header}>
-                <Text style={styles.name}>{product.name}</Text>
+            <View style={styles.productCard}>
+                <Image
+                    source={require('@/assets/images/meal_2.png')}
+                    style={styles.productImage}
+                />
+
+                <View style={styles.productInfo}>
+                    <View style={styles.header}>
+                        <Text style={styles.name}>{product.name}</Text>
+                    </View>
+
+                    <Text style={styles.category}>{product.category}</Text>
+
+                    <View style={styles.details}>
+                        {product.fidelity_program && (
+                            <View style={styles.badge}>
+                                <Text style={styles.badgeText}>Loyalty Program</Text>
+                            </View>
+                        )}
+
+                        {product.proposed && (
+                            <View style={[styles.badge, styles.proposedBadge]}>
+                                <Text style={styles.badgeText}>Available</Text>
+                            </View>
+                        )}
+                    </View>
+                </View>
             </View>
 
-            <Text style={styles.category}>{product.category}</Text>
-            <Text style={styles.description}>{product.description}</Text>
-
-            <View style={styles.details}>
-                {product.fidelity_program && (
-                    <View style={styles.badge}>
-                        <Text style={styles.badgeText}>Loyalty Program</Text>
-                    </View>
-                )}
-
-                {product.proposed && (
-                    <View style={[styles.badge, styles.proposedBadge]}>
-                        <Text style={styles.badgeText}>Available</Text>
-                    </View>
-                )}
-            </View>
 
             <View style={styles.footer}>
                 <Text style={styles.dateText}>{FormatDate(product.created_at)}</Text>
                 {product.updated_at !== product.created_at && (
                     <Text style={styles.dateText}>formatDate(product.updated_at)</Text>
                 )}
-                <Text style={styles.price}>${product.price}</Text>
+                <Text style={styles.price}>{product.price} €</Text>
                 <Link href={{pathname: '/product/[productId]', params: {productId: product.id}}}> Détails </Link>
             </View>
         </TouchableOpacity>
@@ -49,11 +59,27 @@ export default function ProductCard ({ product }: {product: Product}) {
 }
 
 const styles = StyleSheet.create({
+    productCard: {
+        flexDirection: "row",
+        justifyContent: "space-around",
+
+        paddingHorizontal: 8,
+        paddingVertical: 8,
+
+    },
+    productImage: {
+        width: 100,
+        height: 100,
+
+        borderRadius: 8,
+    },
+    productInfo: {
+        width: "60%",
+    },
     card: {
         backgroundColor: "white",
         borderRadius: 12,
-        padding: 16,
-        marginBottom: 16,
+        padding: 12,
         shadowColor: "#000",
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.1,
