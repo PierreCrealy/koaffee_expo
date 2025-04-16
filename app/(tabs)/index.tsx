@@ -79,7 +79,7 @@ export default function HomeScreen() {
             </ThemedView>
 
             <ThemedText type="default">Vous êtes en {location}</ThemedText>
-            {/*<Button title="test" onPress={() => sendNotification()} />*/}
+            <Button title="test" onPress={() => sendNotification()} />
 
             <ThemedView style={styles.stepContainer}>
                 <CategorySection categories={categories} />
