@@ -8,8 +8,13 @@ export default function ProductCard ({ product }: {product: Product}) {
 
     const router = useRouter();
 
+    const showProducts = () => {
+        router.navigate('/product/[productId]')
+        router.setParams({ productId: product.id })
+    }
+
     return (
-        <TouchableOpacity style={styles.card}>
+        <TouchableOpacity style={styles.card} onPress={() => showProducts()}>
             {Boolean(product.highlight) && (
                 <View style={styles.highlightBadge}>
                     <Text style={styles.highlightText}>Featured</Text>
@@ -36,11 +41,6 @@ export default function ProductCard ({ product }: {product: Product}) {
                             </View>
                         )}
 
-                        {Boolean(product.proposed) && (
-                            <View style={[styles.badge, styles.proposedBadge]}>
-                                <Text style={styles.badgeText}>Available</Text>
-                            </View>
-                        )}
                     </View>
                 </View>
             </View>
@@ -51,8 +51,7 @@ export default function ProductCard ({ product }: {product: Product}) {
                 {product.updated_at !== product.created_at && (
                     <Text style={styles.dateText}>{FormatDate(product.updated_at)}</Text>
                 )}
-                <Text style={styles.price}>{product.price}</Text>
-                <Link href={{pathname: '/product/[productId]', params: {productId: product.id}}}> <Text style={{ color: 'blue' }}> Détails </Text> </Link>
+                <Text style={styles.price}>{product.price} €</Text>
             </View>
         </TouchableOpacity>
     )

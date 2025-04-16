@@ -2,9 +2,13 @@ import { StyleSheet, View, Text, FlatList, TouchableOpacity } from "react-native
 //import { useCart } from "../context/CartContext"
 import CartItem from "./CartItem"
 import { Product } from "@/entities/Product";
+import {useContext} from "react";
+import {CartContext} from "@/contexts/CartContext";
 
-const CartSection = ({products}: {products: Product[]}) => {
-  //const { cartItems, clearCart, getCartTotal } = useCart()
+const CartSection = ({products, total}: {products: Product[], total: number}) => {
+
+  // @ts-ignore
+  const { removeFromCart, cleanCart } = useContext(CartContext);
 
   if (products.length === 0) {
     return (
@@ -18,7 +22,7 @@ const CartSection = ({products}: {products: Product[]}) => {
     <View style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.title}>Panier</Text>
-        <TouchableOpacity>
+        <TouchableOpacity onPress={() => cleanCart()}>
           <Text style={styles.clearButton}>Nettoyer</Text>
         </TouchableOpacity>
       </View>
@@ -26,12 +30,18 @@ const CartSection = ({products}: {products: Product[]}) => {
       <FlatList
         data={products}
         keyExtractor={(item) => item.id.toString()}
-        renderItem={({ item }) => <CartItem product={item} />}
+        renderItem={({ item }) => (
+            <View>
+              <TouchableOpacity onPress={() => removeFromCart(item)}>
+                <CartItem product={item} />
+              </TouchableOpacity>
+            </View>
+        )}
         scrollEnabled={false}
       />
 
       <View style={styles.footer}>
-        <Text style={styles.totalText}>Total: {products.reduce((total,product) => total + product.price, 0 )} €</Text>
+        <Text style={styles.totalText}>Total: {total} €</Text>
       </View>
     </View>
   )

@@ -2,7 +2,7 @@ import {StyleSheet, View, Text, FlatList, TouchableOpacity, Image} from "react-n
 
 import CartItem from "./CartItem"
 import React from "react";
-import {Link, useRouter} from "expo-router";
+import { useRouter} from "expo-router";
 
 const CategorySection = ({categories}: {categories: string[]}) => {
 

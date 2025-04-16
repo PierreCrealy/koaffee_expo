@@ -1,4 +1,4 @@
-import {Image, StyleSheet, Platform, Button, TextInput} from 'react-native';
+import {Image, StyleSheet, Button, TextInput} from 'react-native';
 
 import { HelloWave } from '@/components/HelloWave';
 import ParallaxScrollView from '@/components/ParallaxScrollView';
@@ -15,17 +15,6 @@ export default function AuthScreen() {
     const [password, setPassword] = React.useState('cda');
 
     const router = useRouter();
-
-    async function fetchExchange()
-    {
-        const response = await fetch('https://pass-api.pierre-dev-app.fr/api/v1/exchange/1');
-        const data = await response.json();
-
-        // alert('Call response : ' + data.exchange.access);
-        // alert("Store token : " + await SecureStore.getItemAsync('token'));
-
-        router.push('/(tabs)/secure')
-    }
 
     async function attemptConnexion()
     {
@@ -52,7 +41,7 @@ export default function AuthScreen() {
 
             await SecureStore.setItemAsync('userToken', data.success.token)
             // @ts-ignore
-            await SecureStore.setItemAsync('userInfo', JSON.stringify({ name: data.success.name, email: data.success.email }))
+            await SecureStore.setItemAsync('userInfo', JSON.stringify({ id: data.success.id, name: data.success.name, email: data.success.email }))
 
             // alert("Store token : " + await SecureStore.getItemAsync('token'))
             // alert('Connexion réussi.')

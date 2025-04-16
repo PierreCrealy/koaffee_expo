@@ -14,14 +14,18 @@ import { useNavigation } from "expo-router";
 
 import ProductCard from '@/components/ProductCard';
 
-import React, { useEffect } from "react";
+import React, {useContext, useEffect} from "react";
 import { Product } from "@/entities/Product";
+import {CartContext} from "@/contexts/CartContext";
 
 export default function ProductsCategoryScreen() {
     const {categoryId} = useLocalSearchParams();
     const navigation = useNavigation();
 
     const [products, setProducts] = React.useState<Product[]>([]);
+
+    // @ts-ignore
+    const { addToCart, cartProducts } = useContext(CartContext);
 
     useEffect(() => {
         const fetchProducts = async () => {
@@ -59,9 +63,11 @@ export default function ProductsCategoryScreen() {
                         (
                             <View style={styles.itemProduct}>
                                 <ProductCard product={item} />
-                                <TouchableOpacity style={styles.addBtn} >
-                                    <Text style={styles.textBtn}>Ajouter +</Text>
-                                </TouchableOpacity>
+                                <View style={styles.actionItemProduct}>
+                                    <TouchableOpacity style={styles.addBtn} onPress={() => addToCart(item)}>
+                                        <Text style={styles.textBtn}>Ajouter +</Text>
+                                    </TouchableOpacity>
+                                </View>
                             </View>
 
                         )}

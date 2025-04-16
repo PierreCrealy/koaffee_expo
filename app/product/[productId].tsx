@@ -16,7 +16,7 @@ import React, { useEffect } from "react";
 import { Product } from "@/entities/Product";
 import { FormatDate } from "@/usefuls/FormatDate";
 
-export default function HomeScreen() {
+export default function ProductScreen() {
     const {productId} = useLocalSearchParams();
     const navigation = useNavigation();
     const [product, setProduct] = React.useState<Product>();
@@ -37,7 +37,6 @@ export default function HomeScreen() {
     useEffect(() => {
         navigation.setOptions({ headerShown: true, title: 'Produit' });
     }, [navigation]);
-
 
     return (
         <ParallaxScrollView

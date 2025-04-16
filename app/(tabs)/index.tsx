@@ -1,40 +1,33 @@
 import {
+    Button,
     Image,
     StyleSheet,
-    Platform,
-    Button,
-    SectionList,
-    View,
-    Text,
-    GestureResponderEvent,
-    FlatList, ScrollView, TouchableOpacity
 } from 'react-native';
+import React, { useEffect } from "react";
 
 import {HelloWave} from '@/components/HelloWave';
 import ParallaxScrollView from '@/components/ParallaxScrollView';
 import {ThemedText} from '@/components/ThemedText';
 import {ThemedView} from '@/components/ThemedView';
+import CartSection from "@/components/CartSection";
+import CategorySection from "@/components/CategorySection";
+
+
+import { Product } from "@/entities/Product";
+import { User } from "@/entities/User";
+
+import { Categories } from "@/usefuls/Categories";
 
 import * as Notifications from 'expo-notifications';
 import * as SecureStore from "expo-secure-store";
-
-import React, {useCallback, useEffect} from "react";
-import ProductCard from "@/components/ProductCard";
-import {StatusBar} from "expo-status-bar";
-import { Product } from "@/entities/Product";
-import { User } from "@/entities/User";
-import * as SplashScreen from "expo-splash-screen";
-import CartSection from "@/components/CartSection";
-import CategorySection from "@/components/CategorySection";
 
 
 export default function HomeScreen() {
 
     const [cartProducts, setCartProducts] = React.useState<Product[]>([]);
-    const [products, setProducts] = React.useState<Product[]>([]);
     const [categories, setCategories] = React.useState<string[]>([]);
-
     const [user, setUser] = React.useState<User>();
+    const [location, setLocation] = React.useState();
 
     const sendNotification = async () => {
         await Notifications.scheduleNotificationAsync({
@@ -48,26 +41,27 @@ export default function HomeScreen() {
     };
 
     useEffect(() => {
-        const fetchProducts = async () => {
-            fetch('https://pass-api.pierre-dev-app.fr/api/v1/product')
-                .then((response) => response.json())
-                .then(data => {
-                    setProducts(data.products);
-                    // sendNotification();
-                })
-                .catch((e) => alert('error : ' + e.message));
-        }
-
-        fetchProducts();
+        setCategories(Categories)
     }, []);
 
     useEffect(() => {
-        const cat = products.map((product) => product.category);
-        const uniqueCat = [...new Set(cat)];
+        const loadUser = async () => {
+            const token = await SecureStore.getItemAsync('userToken');
+            const userInfo = await SecureStore.getItemAsync('userInfo');
 
-        // @ts-ignore
-        setCategories(uniqueCat)
-    }, [products]);
+            const userSec = JSON.parse((userInfo) as string);
+            setUser(userSec);
+        }
+
+        const loadLocation = async () => {
+            const locationSec = await SecureStore.getItemAsync('location');
+            // @ts-ignore
+            setLocation(locationSec)
+        }
+
+        loadLocation()
+        loadUser();
+    }, []);
 
     async function fetchExchange() {
         const response = await fetch('https://pass-api.pierre-dev-app.fr/api/v1/exchange/1');
@@ -84,19 +78,6 @@ export default function HomeScreen() {
         setCartProducts((prev) => prev.filter((name) => name !== item));
     }
 
-
-    useEffect(() => {
-        const loadUser = async () => {
-            const token = await SecureStore.getItemAsync('userToken');
-            const userInfo = await SecureStore.getItemAsync('userInfo');
-            const userSec = JSON.parse(userInfo);
-
-            setUser(userSec);
-        }
-
-        loadUser();
-    }, []);
-
     return (
         <ParallaxScrollView
             headerBackgroundColor={{light: '#A1CEDC', dark: '#1D3D47'}}
@@ -111,38 +92,13 @@ export default function HomeScreen() {
                 <HelloWave/>
             </ThemedView>
 
-
-            <ThemedView style={styles.stepContainer}>
-                <CartSection products={cartProducts} />
-            </ThemedView>
+            <ThemedText type="default">Vous êtes en {location}</ThemedText>
+            <Button title="test" onPress={() => sendNotification()} />
 
             <ThemedView style={styles.stepContainer}>
                 <CategorySection categories={categories} />
             </ThemedView>
 
-
-            <ThemedView>
-                <FlatList
-                    scrollEnabled={false}
-                    data={products}
-                    keyExtractor={(item) => item.id.toString()}
-                    renderItem={({ item }) =>
-                        (
-                            <View style={styles.itemProduct}>
-                                <ProductCard product={item} />
-                                <View style={styles.actionItemProduct}>
-                                    <TouchableOpacity style={styles.addBtn} onPress={() => addCartProduct(item)}>
-                                        <Text style={styles.textBtn}>Ajouter +</Text>
-                                    </TouchableOpacity>
-                                </View>
-                            </View>
-
-                        )}
-                    contentContainerStyle={styles.list}
-                    // refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={["#f4511e"]} />}
-                    ListEmptyComponent={<Text style={styles.emptyText}>Aucun produit disponible</Text>}
-                />
-            </ThemedView>
 
         </ParallaxScrollView>
     );
