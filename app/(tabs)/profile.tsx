@@ -13,7 +13,7 @@ import { useRouter } from "expo-router";
 import { User } from "@/entities/User";
 import Ionicons from "@expo/vector-icons/Ionicons";
 
-export default function TabSettingScreen() {
+export default function ProfileScreen() {
 
     const router = useRouter();
     const [user, setUser] = useState<User>();
@@ -55,7 +55,6 @@ export default function TabSettingScreen() {
                 <ThemedText type="default">Nom   : {user?.name}</ThemedText>
                 <ThemedText type="default">Email : {user?.email}</ThemedText>
             </ThemedView>
-            <ThemedText>This app includes example code to help you get started.</ThemedText>
 
 
             <Collapsible title="Commandes">

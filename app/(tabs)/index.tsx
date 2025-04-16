@@ -1,26 +1,24 @@
-import {
-    Button,
-    Image,
-    StyleSheet,
-} from 'react-native';
-import React, { useEffect } from "react";
+import {Button, Image, StyleSheet, View,} from 'react-native';
+import React, {useEffect} from "react";
 
 import {HelloWave} from '@/components/HelloWave';
 import ParallaxScrollView from '@/components/ParallaxScrollView';
 import {ThemedText} from '@/components/ThemedText';
 import {ThemedView} from '@/components/ThemedView';
-import CartSection from "@/components/CartSection";
 import CategorySection from "@/components/CategorySection";
 
 
-import { Product } from "@/entities/Product";
-import { User } from "@/entities/User";
+import {Product} from "@/entities/Product";
+import {User} from "@/entities/User";
 
-import { Categories } from "@/usefuls/Categories";
+import {Categories} from "@/usefuls/Categories";
+import {Structures} from "@/usefuls/Structures";
 
 import * as Notifications from 'expo-notifications';
 import * as SecureStore from "expo-secure-store";
 
+import MapView, {Marker} from "react-native-maps";
+import Ionicons from "@expo/vector-icons/Ionicons";
 
 export default function HomeScreen() {
 
@@ -61,23 +59,11 @@ export default function HomeScreen() {
 
         loadLocation()
         loadUser();
+
     }, []);
 
-    async function fetchExchange() {
-        const response = await fetch('https://pass-api.pierre-dev-app.fr/api/v1/exchange/1');
-        const data = await response.json();
 
-        alert('Store token : ' + await SecureStore.getItemAsync('token'));
-    }
-
-    const addCartProduct = (item: Product) => {
-        setCartProducts((prev) => [...prev, item]);
-    }
-
-    const removeCartProduct = (item: Product) => {
-        setCartProducts((prev) => prev.filter((name) => name !== item));
-    }
-
+    // @ts-ignore
     return (
         <ParallaxScrollView
             headerBackgroundColor={{light: '#A1CEDC', dark: '#1D3D47'}}
@@ -93,11 +79,39 @@ export default function HomeScreen() {
             </ThemedView>
 
             <ThemedText type="default">Vous êtes en {location}</ThemedText>
-            <Button title="test" onPress={() => sendNotification()} />
+            {/*<Button title="test" onPress={() => sendNotification()} />*/}
 
             <ThemedView style={styles.stepContainer}>
                 <CategorySection categories={categories} />
             </ThemedView>
+
+
+            <ThemedView style={styles.titleContainer}>
+                <ThemedText type="title">Nos structures</ThemedText>
+                <Ionicons name="home-sharp" size={28} color="black" />
+            </ThemedView>
+
+            <View style={styles.mapContainer}>
+                <MapView style={styles.map}
+                         initialRegion={{
+                             latitude: 46.603354,
+                             longitude: 1.888334,
+                             latitudeDelta: 10,
+                             longitudeDelta: 10,
+                         }}
+                >
+                    {Structures.map((marker) => (
+                        <Marker
+                            key={marker.id}
+                            coordinate={marker.coordinate}
+                            title={marker.title}
+                            pinColor={marker.color}
+                        >
+                            <Ionicons name={marker.icon} size={28} color={marker.color} />
+                        </Marker>
+                    ))}
+                </MapView>
+            </View>
 
 
         </ParallaxScrollView>
@@ -105,6 +119,13 @@ export default function HomeScreen() {
 }
 
 const styles = StyleSheet.create({
+    mapContainer: {
+
+    },
+    map: {
+        width: '100%',
+        height: 300,
+    },
     titleContainer: {
         flexDirection: 'row',
         alignItems: 'center',

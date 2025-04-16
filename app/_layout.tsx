@@ -29,6 +29,7 @@ Notifications.setNotificationHandler({
   }),
 });
 
+import { Structures } from "@/usefuls/Structures";
 
 export default function RootLayout() {
   const [location, setLocation] = useState(undefined);
@@ -36,6 +37,7 @@ export default function RootLayout() {
   const [loaded] = useFonts({
     SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
   });
+
 
   useEffect(() => {
     const requestPermissions = async () => {
@@ -56,12 +58,14 @@ export default function RootLayout() {
         alert('Permission refusée');
       }
 
-      let { coords } = await Location.getCurrentPositionAsync();
+      let locations = await Location.getCurrentPositionAsync();
+      console.log(locations);
       // @ts-ignore
-      setLocation(coords);
+      setLocation(locations);
 
-      const { latitude, longitude } = coords;
+      const { latitude, longitude } = locations.coords;
       const geoCode = await Location.reverseGeocodeAsync({latitude, longitude})
+      console.log(geoCode);
 
       const { isoCountryCode } = geoCode[0];
       await SecureStore.setItemAsync('location', (isoCountryCode != null ? isoCountryCode : 'FR'));
