@@ -7,29 +7,26 @@ import {useRouter} from "expo-router";
 
 
 
-const LogoutBubble = () => {
+const StructuretBubble = () => {
 
     const router = useRouter();
 
-    async function attemptDisconnect()
+    async function navigateToStructurePage()
     {
-        await SecureStore.deleteItemAsync('userToken')
-        await SecureStore.deleteItemAsync('userInfo')
-
-        router.push('/auth')
+        router.navigate('/structure')
     }
 
 
     return (
         <View style={styles.container}>
-            <TouchableOpacity onPress={attemptDisconnect}>
-                <Ionicons name="log-out" size={32} color="#f4511e" />
+            <TouchableOpacity onPress={navigateToStructurePage}>
+                <Ionicons name="storefront" size={32} color="#f4511e" />
             </TouchableOpacity>
         </View>
     )
 }
 
-export default LogoutBubble
+export default StructuretBubble
 
 const styles = StyleSheet.create({
     container: {

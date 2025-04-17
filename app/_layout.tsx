@@ -26,8 +26,8 @@ Notifications.setNotificationHandler({
   }),
 });
 
-import { Structures } from "@/usefuls/Structures";
 import {User} from "@/entities/User";
+import StructuretBubble from "@/components/StructureBubble";
 
 export default function RootLayout() {
   const router = useRouter();
@@ -105,7 +105,7 @@ export default function RootLayout() {
       <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
         <CartProvider>
 
-          {/*<LogoutBubble />*/}
+          <StructuretBubble />
 
           <Stack screenOptions={{ headerShown: false }}>
 

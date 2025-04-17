@@ -1,4 +1,4 @@
-import {StyleSheet, Image, Text, TouchableOpacity, View, SectionList} from 'react-native';
+import {StyleSheet, Image, Text, TouchableOpacity, View, SectionList, ActivityIndicator} from 'react-native';
 
 import { Collapsible } from '@/components/Collapsible';
 import { ExternalLink } from '@/components/ExternalLink';
@@ -21,21 +21,32 @@ export default function ProfileScreen() {
     const router = useRouter();
     const [user, setUser] = useState<User>();
     const [orders, setOrders] = useState<Order[]>([]);
+    const [token, setToken] = useState<string>();
+    const [loading, setLoading] = useState(false);
 
     useFocusEffect(
         useCallback(() => {
             const loadUser = async () => {
-                const token = await SecureStore.getItemAsync('userToken');
+                const tokenSec = await SecureStore.getItemAsync('userToken');
                 const userInfo = await SecureStore.getItemAsync('userInfo');
                 const userStore = JSON.parse((userInfo) as string);
 
                 setUser(userStore);
+                setToken((tokenSec) as string);
             }
             const fetchOrders = async () => {
-                await fetch(`https://pass-api.pierre-dev-app.fr/api/v1/order/${user?.id}/group-by-status`)
+                setLoading(true);
+                await fetch(`https://pass-api.pierre-dev-app.fr/api/v1/order/${user?.id}/group-by-status`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`,
+                    },
+                })
                     .then((response) => response.json())
                     .then(data => {
                         setOrders(data.orders);
+                        setLoading(false);
                     })
                     .catch((e) => console.log('error : ' + e.message));
             }
@@ -70,6 +81,7 @@ export default function ProfileScreen() {
                 />
             }
         >
+
             <ThemedView style={styles.titleContainer}>
                 <ThemedText type="title">Profil</ThemedText>
             </ThemedView>
@@ -80,31 +92,36 @@ export default function ProfileScreen() {
             </ThemedView>
 
 
-            <Collapsible title="Commandes">
-                <SectionList
-                    scrollEnabled={false}
-                    sections={sections}
-                    keyExtractor={(item) => item.id.toString()}
-                    ListEmptyComponent={<Text style={styles.emptyText}>Aucune commandes passées</Text>}
-                    renderItem={({item}) => (
-
-                        <View style={styles.itemProduct}>
-                            <OrderCard order={item} />
-                        </View>
-
-                    )}
-                    renderSectionHeader={({section}) => (
-                        <Text style={styles.header}>
-                            {section.title}
-                        </Text>
-                    )}
-                />
-            </Collapsible>
-
-
             <TouchableOpacity style={styles.disconnectBtn}  onPress={() => attemptDisconnect()} >
                 <Text style={styles.textBtn}>Se déconnecter</Text><Ionicons name="log-out" size={32} color="#f4511e" />
             </TouchableOpacity>
+
+            <Collapsible title="Commandes">
+
+                { loading ? (
+                    <ActivityIndicator size="large" color="#B3D8DE" />
+                ) : (
+                    <SectionList
+                        scrollEnabled={false}
+                        sections={sections}
+                        keyExtractor={(item) => item.id.toString()}
+                        ListEmptyComponent={<Text style={styles.emptyText}>Aucune commandes passées</Text>}
+                        renderItem={({item}) => (
+
+                            <View style={styles.itemProduct}>
+                                <OrderCard order={item} />
+                            </View>
+
+                        )}
+                        renderSectionHeader={({section}) => (
+                            <ThemedView style={styles.titleContainer}>
+                                <ThemedText type="title" style={styles.header}>{ section.title}</ThemedText>
+                            </ThemedView>
+                        )}
+                    />
+                )}
+
+            </Collapsible>
 
     </ParallaxScrollView>
   );
@@ -113,8 +130,7 @@ export default function ProfileScreen() {
 const styles = StyleSheet.create({
     header: {
         marginTop: 60,
-        fontSize: 32,
-        backgroundColor: '#fff',
+        marginBottom: 35,
     },
     emptyText: {
         fontSize: 16,

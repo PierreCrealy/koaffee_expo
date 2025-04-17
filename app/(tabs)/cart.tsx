@@ -21,7 +21,7 @@ import { User } from "@/entities/User";
 import { CartContext } from "@/contexts/CartContext";
 import Ionicons from "@expo/vector-icons/Ionicons";
 
-import { CountriesBonus } from "@/usefuls/CountriesBonus";
+import { CountriesBonus } from "@/constants/CountriesBonus";
 import SendNotification from "@/usefuls/SendNotification";
 
 
@@ -34,15 +34,17 @@ export default function CartScreen() {
     const { cleanCart, cartProducts } = useContext(CartContext);
     const [user, setUser] = React.useState<User>();
     const [location, setLocation] = React.useState();
+    const [token, setToken] = React.useState<string>();
 
     useFocusEffect(
         useCallback(() => {
             const loadUser = async () => {
-                const token = await SecureStore.getItemAsync('userToken');
+                const tokenSec = await SecureStore.getItemAsync('userToken');
                 const userInfo = await SecureStore.getItemAsync('userInfo');
                 const userSec = JSON.parse((userInfo) as string);
 
                 setUser(userSec);
+                setToken((tokenSec) as string);
             }
             const loadLocation = async () => {
                 const locationSec = await SecureStore.getItemAsync('location');
@@ -88,6 +90,7 @@ export default function CartScreen() {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`,
                     },
                     body: JSON.stringify(infos)
                 }
@@ -101,7 +104,7 @@ export default function CartScreen() {
 
             SendNotification({
                 title: 'Commande passée, merci !',
-                body: `Votre commande est en cours de préparation.`,
+                body: `Votre commande n°?? est en cours de préparation...`,
                 data: {extraData: ''}
             })
 

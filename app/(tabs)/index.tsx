@@ -1,4 +1,4 @@
-import {Button, Image, StyleSheet, View,} from 'react-native';
+import {ActivityIndicator, Button, Image, StyleSheet, View,} from 'react-native';
 import React, {useCallback, useEffect} from "react";
 
 import {HelloWave} from '@/components/HelloWave';
@@ -10,8 +10,7 @@ import CategorySection from "@/components/CategorySection";
 import {User} from "@/entities/User";
 import {Order} from "@/entities/Order";
 
-import {Categories} from "@/usefuls/Categories";
-import {Structures} from "@/usefuls/Structures";
+import {Categories} from "@/constants/Categories";
 
 import * as SecureStore from "expo-secure-store";
 
@@ -26,6 +25,9 @@ export default function HomeScreen() {
     const [user, setUser] = React.useState<User>();
     const [location, setLocation] = React.useState();
     const [order, setOrder] = React.useState<Order>();
+    const [token, setToken] = React.useState<string>();
+
+    const [loading, setLoading] = React.useState(false);
 
     useFocusEffect(
         useCallback(() => {
@@ -35,11 +37,12 @@ export default function HomeScreen() {
     useFocusEffect(
         useCallback(() => {
             const loadUser = async () => {
-                const token = await SecureStore.getItemAsync('userToken');
+                const tokenSec = await SecureStore.getItemAsync('userToken');
                 const userInfo = await SecureStore.getItemAsync('userInfo');
 
                 const userSec = JSON.parse(userInfo as string);
                 setUser(userSec);
+                setToken((tokenSec) as string);
 
                 latestProgressUserOrder();
             };
@@ -49,12 +52,20 @@ export default function HomeScreen() {
                 // @ts-ignore
                 setLocation(locationSec);
             };
-
             const latestProgressUserOrder = async () => {
-                 await fetch(`https://pass-api.pierre-dev-app.fr/api/v1/order/${user?.id}/PROGRESS/latest`)
+                setLoading(true);
+
+                await fetch(`https://pass-api.pierre-dev-app.fr/api/v1/order/${user?.id}/PROGRESS/latest`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`,
+                    },
+                })
                     .then((response) => response.json())
                     .then(data => {
                         setOrder(data.orders);
+                        setLoading(false);
                     })
                     .catch((e) => console.log('error : ' + e.message));
             };
@@ -87,7 +98,13 @@ export default function HomeScreen() {
 
             <ThemedText type="default">Vous êtes en {location}</ThemedText>
 
-            <OrderProgress order={order}/>
+
+            { loading ? (
+                <ActivityIndicator size="large" color="#B3D8DE" />
+            ) : (
+                <OrderProgress order={order}/>
+            )}
+
 
             <ThemedView style={styles.sectionContainer}>
                 <ThemedText type="title">Catégories</ThemedText>
@@ -99,46 +116,11 @@ export default function HomeScreen() {
             </ThemedView>
 
 
-            <ThemedView style={styles.titleContainer}>
-                <ThemedText type="title">Nos structures</ThemedText>
-                <Ionicons name="storefront" size={28} color="black" />
-            </ThemedView>
-
-            <View style={styles.mapContainer}>
-                <MapView style={styles.map}
-                         initialRegion={{
-                             latitude: 46.603354,
-                             longitude: 1.888334,
-                             latitudeDelta: 10,
-                             longitudeDelta: 10,
-                         }}
-                >
-                    {Structures.map((marker) => (
-                        <Marker
-                            key={marker.id}
-                            coordinate={marker.coordinate}
-                            title={marker.title}
-                            pinColor={marker.color}
-                        >
-                            <Ionicons name={marker.icon} size={28} color={marker.color} />
-                        </Marker>
-                    ))}
-                </MapView>
-            </View>
-
-
         </ParallaxScrollView>
     );
 }
 
 const styles = StyleSheet.create({
-    mapContainer: {
-
-    },
-    map: {
-        width: '100%',
-        height: 300,
-    },
     sectionContainer: {
         flexDirection: 'row',
         alignItems: 'center',

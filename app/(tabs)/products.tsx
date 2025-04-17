@@ -1,4 +1,12 @@
-import {StyleSheet, Image, View, TouchableOpacity, Text, SectionList} from 'react-native';
+import {
+    StyleSheet,
+    Image,
+    View,
+    TouchableOpacity,
+    Text,
+    SectionList,
+    ActivityIndicator,
+} from 'react-native';
 
 import ParallaxScrollView from '@/components/ParallaxScrollView';
 import { ThemedText } from '@/components/ThemedText';
@@ -18,33 +26,36 @@ export default function ProductsScreen() {
 
     const [products, setProducts] = useState<Product[]>([]);
     const [user, setUser] = React.useState<User>();
-
-    useFocusEffect(
-        useCallback(() => {
-            const fetchProducts = async () => {
-                fetch('https://pass-api.pierre-dev-app.fr/api/v1/product/group-by-category')
-                    .then((response) => response.json())
-                    .then(data => {
-                        setProducts(data.products);
-                    })
-                    .catch((e) => alert('error : ' + e.message));
-            }
-            const loadUser = async () => {
-                const token = await SecureStore.getItemAsync('userToken');
-                const userInfo = await SecureStore.getItemAsync('userInfo');
-                const userSec = JSON.parse((userInfo) as string);
-
-                setUser(userSec);
-            }
-
-            fetchProducts();
-            loadUser();
-
-        }, [user?.id])
-    );
+    const [token, setToken] = React.useState<string>();
+    const [loading, setLoading] = React.useState(false);
 
     // @ts-ignore
     const { addToCart, cartProducts } = useContext(CartContext);
+
+    const fetchProducts = async () => {
+        setLoading(true);
+        fetch('https://pass-api.pierre-dev-app.fr/api/v1/product/group-by-category', {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`,
+            },
+        })
+            .then((response) => response.json())
+            .then(data => {
+                setProducts(data.products);
+                setLoading(false);
+            })
+            .catch((e) => alert('error : ' + e.message));
+    }
+    const loadUser = async () => {
+        const tokenSec = await SecureStore.getItemAsync('userToken');
+        const userInfo = await SecureStore.getItemAsync('userInfo');
+        const userSec = JSON.parse((userInfo) as string);
+
+        setUser(userSec);
+        setToken((tokenSec) as string);
+    }
 
     const sections = Object.keys(products).map(category => ({
         title: category,
@@ -52,6 +63,14 @@ export default function ProductsScreen() {
         data: products[category],
     }));
 
+
+    useFocusEffect(
+        useCallback(() => {
+            fetchProducts();
+            loadUser();
+
+        }, [user?.id])
+    );
 
     return (
         <ParallaxScrollView
@@ -69,31 +88,35 @@ export default function ProductsScreen() {
             <ThemedText>Voici une liste de tous nos produits disponible, organisé par catégorie.</ThemedText>
 
 
-            <ThemedView>
-                <SectionList
-                    scrollEnabled={false}
-                    sections={sections}
-                    keyExtractor={(item) => item.id.toString()}
-                    ListEmptyComponent={<Text style={styles.emptyText}>Aucun produit disponible</Text>}
-                    renderItem={({item}) => (
+            {loading ? (
+                <ActivityIndicator size="large" color="#B3D8DE" />
+            ) : (
+                <ThemedView>
+                    <SectionList
+                        scrollEnabled={false}
+                        sections={sections}
+                        keyExtractor={(item) => item.id.toString()}
+                        ListEmptyComponent={<Text style={styles.emptyText}>Aucun produit disponible</Text>}
+                        renderItem={({item}) => (
 
-                        <View style={styles.itemProduct}>
-                            <ProductCard product={item} />
-                            <View style={styles.actionItemProduct}>
-                                <TouchableOpacity style={styles.addBtn} onPress={() => addToCart(item)}>
-                                    <Text style={styles.textBtn}>Ajouter +</Text>
-                                </TouchableOpacity>
+                            <View style={styles.itemProduct}>
+                                <ProductCard product={item} />
+                                <View style={styles.actionItemProduct}>
+                                    <TouchableOpacity style={styles.addBtn} onPress={() => addToCart(item)}>
+                                        <Text style={styles.textBtn}>Ajouter +</Text>
+                                    </TouchableOpacity>
+                                </View>
                             </View>
-                        </View>
 
-                    )}
-                    renderSectionHeader={({section}) => (
-                        <Text style={styles.header}>
-                            {section.title}
-                        </Text>
-                    )}
-                />
-            </ThemedView>
+                        )}
+                        renderSectionHeader={({section}) => (
+                            <ThemedView style={styles.titleContainer}>
+                                <ThemedText type="title" style={styles.header}>{ section.title}</ThemedText>
+                            </ThemedView>
+                        )}
+                    />
+                </ThemedView>
+            )}
 
         </ParallaxScrollView>
   );
@@ -105,8 +128,7 @@ const styles = StyleSheet.create({
     },
     header: {
         marginTop: 60,
-        fontSize: 32,
-        backgroundColor: '#fff',
+        marginBottom: 35,
     },
     addBtn: {
         backgroundColor: '#F5F5F5',

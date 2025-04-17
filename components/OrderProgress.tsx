@@ -42,7 +42,9 @@ const OrderProgress = ({ order }: {order: any}) => {
             </View>
           </View>
 
-          <Progress.Bar progress={0.3} width={350} animated={true} color="#f4511e" />
+          <View style={styles.progressRow}>
+            <Progress.Bar progress={0.3} width={200} animated={true} color="#f4511e" />
+          </View>
 
         </View>
       </TouchableOpacity>
@@ -68,6 +70,10 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
+  },
+  progressRow: {
+    alignItems: "center",
+    alignContent: "center",
   },
   infoRow: {
     flexDirection: "row",
