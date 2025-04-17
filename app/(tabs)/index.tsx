@@ -51,7 +51,7 @@ export default function HomeScreen() {
             };
 
             const latestProgressUserOrder = async () => {
-                 fetch(`https://pass-api.pierre-dev-app.fr/api/v1/order/${user?.id}/PROGRESS/latest`)
+                 await fetch(`https://pass-api.pierre-dev-app.fr/api/v1/order/${user?.id}/PROGRESS/latest`)
                     .then((response) => response.json())
                     .then(data => {
                         setOrder(data.orders);

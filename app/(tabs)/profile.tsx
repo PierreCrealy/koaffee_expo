@@ -60,7 +60,6 @@ export default function ProfileScreen() {
         router.push('/auth')
     }
 
-
     return (
         <ParallaxScrollView
             headerBackgroundColor={{ light: '#D0D0D0', dark: '#353636' }}

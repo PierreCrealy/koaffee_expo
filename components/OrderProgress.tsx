@@ -21,29 +21,31 @@ const OrderProgress = ({ order }: {order: any}) => {
   }
 
   return (
-    <View style={styles.container}>
-      <View style={styles.header}>
-        <View style={styles.containerRow}>
-          <Text style={styles.title}>Commande en préparation</Text>
-          <Ionicons name="newspaper" size={28} color="black" />
-        </View>
-        <Text style={styles.orderNumber}>Commande #{order.id}</Text>
-      </View>
+      <TouchableOpacity >
+        <View style={styles.container}>
+          <View style={styles.header}>
+            <View style={styles.containerRow}>
+              <Text style={styles.title}>Commande en préparation</Text>
+              <Ionicons name="newspaper" size={28} color="black" />
+            </View>
+            <Text style={styles.orderNumber}>Commande #{order.id}</Text>
+          </View>
 
-      <View style={styles.infoRow}>
-        <View style={styles.infoItem}>
-          <Text style={styles.infoLabel}>Date de commande</Text>
-          <Text style={styles.infoValue}>{FormatDate(order.created_at)}</Text>
-        </View>
-        <View style={styles.infoItem}>
-          <Text style={styles.infoLabel}>Total</Text>
-          <Text style={styles.infoValue}>{order.total} €</Text>
-        </View>
-      </View>
+          <View style={styles.infoRow}>
+            <View style={styles.infoItem}>
+              <Text style={styles.infoLabel}>Date de commande</Text>
+              <Text style={styles.infoValue}>{FormatDate(order.created_at)}</Text>
+            </View>
+            <View style={styles.infoItem}>
+              <Text style={styles.infoLabel}>Total</Text>
+              <Text style={styles.infoValue}>{order.total} €</Text>
+            </View>
+          </View>
 
-      <Progress.Bar progress={0.3} width={350} animated={true} color="#f4511e" />
+          <Progress.Bar progress={0.3} width={350} animated={true} color="#f4511e" />
 
-    </View>
+        </View>
+      </TouchableOpacity>
   )
 }
 
