@@ -12,8 +12,8 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 
 export default function AuthScreen() {
 
-    const [email, setEmail] = React.useState('guest@cda.fr');
-    const [password, setPassword] = React.useState('cda');
+    const [email, setEmail] = React.useState('');
+    const [password, setPassword] = React.useState('');
 
     const router = useRouter();
 
@@ -54,6 +54,16 @@ export default function AuthScreen() {
         }
     }
 
+    const setUserOneForm = () => {
+        setEmail('guest@cda.fr');
+        setPassword('cda');
+    }
+
+    const setUserTwoForm = () => {
+        setEmail('guest2@cda.fr');
+        setPassword('cda');
+    }
+
   return (
       <ParallaxScrollView
           headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
@@ -74,7 +84,7 @@ export default function AuthScreen() {
                   <Ionicons name="person" size={32} color="#f4511e" />
                   <TextInput
                       onChangeText={(text) => setEmail(text)}
-                      value="guest@cda.fr"
+                      value={email}
                       placeholder="Enter login"
                       style={styles.textInput}
                   />
@@ -84,7 +94,7 @@ export default function AuthScreen() {
                   <Ionicons name="keypad" size={32} color="#f4511e" />
                   <TextInput
                       onChangeText={(text) => setPassword(text)}
-                      value="cda"
+                      value={password}
                       placeholder="Enter password"
                       secureTextEntry={true}
                       style={styles.textInput}
@@ -98,6 +108,17 @@ export default function AuthScreen() {
 
                   <TouchableOpacity style={styles.registerBtn}  onPress={() => alert("Indisponible")} >
                       <Text style={styles.textBtn}>Inscription</Text><Ionicons name="arrow-down" size={32} color="#f4511e" />
+                  </TouchableOpacity>
+              </View>
+
+
+              <View style={styles.buttonContainer}>
+                  <TouchableOpacity style={styles.connexionBtn}  onPress={() => setUserOneForm()} >
+                      <Text style={styles.textBtn}>User 1</Text>
+                  </TouchableOpacity>
+
+                  <TouchableOpacity style={styles.registerBtn}  onPress={() => setUserTwoForm()} >
+                      <Text style={styles.textBtn}>User 2</Text>
                   </TouchableOpacity>
               </View>
 
