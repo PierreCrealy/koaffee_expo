@@ -5,7 +5,7 @@ import { Product } from "@/entities/Product";
 import {useContext} from "react";
 import {CartContext} from "@/contexts/CartContext";
 
-const CartSection = ({products, total}: {products: Product[], total: number}) => {
+const CartSection = ({products, total, bonus}: {products: Product[], total: number, bonus: number}) => {
 
   // @ts-ignore
   const { removeFromCart, cleanCart } = useContext(CartContext);
@@ -42,6 +42,7 @@ const CartSection = ({products, total}: {products: Product[], total: number}) =>
 
       <View style={styles.footer}>
         <Text style={styles.totalText}>Total: {total} €</Text>
+        <Text style={styles.bonusText}>Bonus: {bonus} %</Text>
       </View>
     </View>
   )
@@ -92,10 +93,9 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "bold",
   },
-  totalAmount: {
-    fontSize: 18,
-    fontWeight: "bold",
-    color: "#f4511e",
+  bonusText: {
+    fontSize: 16,
+    fontStyle: "italic",
   },
   emptyContainer: {
     backgroundColor: "white",

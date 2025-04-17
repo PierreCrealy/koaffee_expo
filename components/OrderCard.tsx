@@ -1,57 +1,42 @@
 import { StyleSheet, View, Text, TouchableOpacity, Image} from "react-native"
-import { Product } from "@/entities/Product";
+import { Order } from "@/entities/Order";
 import { Link, useRouter } from "expo-router";
 import { FormatDate } from "@/usefuls/FormatDate";
 import React from "react";
 
-export default function ProductCard ({ product }: {product: Product}) {
-
-    const router = useRouter();
-
-    const showProducts = () => {
-        router.navigate('/product/[productId]')
-        router.setParams({ productId: product.id })
-    }
+export default function OrderCard ({ order }: {order: Order}) {
 
     return (
-        <TouchableOpacity style={styles.card} onPress={() => showProducts()}>
-            {Boolean(product.highlight) && (
-                <View style={styles.highlightBadge}>
-                    <Text style={styles.highlightText}>Featured</Text>
-                </View>
-            )}
+        <TouchableOpacity style={styles.card}>
 
             <View style={styles.productCard}>
                 <Image
-                    source={require('@/assets/images/meal_2.png')}
+                    source={require('@/assets/images/meal_5.png')}
                     style={styles.productImage}
                 />
 
                 <View style={styles.productInfo}>
                     <View style={styles.header}>
-                        <Text style={styles.name}>{product.name}</Text>
+                        <Text style={styles.name}>Commande #{order.id}</Text>
                     </View>
 
-                    <Text style={styles.category}>{product.category}</Text>
+                    <Text style={styles.category}>Table n°{order.table}</Text>
 
                     <View style={styles.details}>
-                        {Boolean(product.fidelity_program) && (
-                            <View style={styles.badge}>
-                                <Text style={styles.badgeText}>Loyalty Program</Text>
-                            </View>
-                        )}
-
+                        <View style={styles.badge}>
+                            <Text style={styles.badgeText}>{order.fidelity_pts_earned} pts</Text>
+                        </View>
                     </View>
                 </View>
             </View>
 
 
             <View style={styles.footer}>
-                <Text style={styles.dateText}>{FormatDate(product.created_at)}</Text>
-                {product.updated_at !== product.created_at && (
-                    <Text style={styles.dateText}>{FormatDate(product.updated_at)}</Text>
+                <Text style={styles.dateText}>{FormatDate(order.created_at)}</Text>
+                {order.updated_at !== order.created_at && (
+                    <Text style={styles.dateText}>{FormatDate(order.updated_at)}</Text>
                 )}
-                <Text style={styles.price}>{product.price} €</Text>
+                <Text style={styles.price}>{order.total} €</Text>
             </View>
         </TouchableOpacity>
     )
@@ -86,21 +71,6 @@ const styles = StyleSheet.create({
         elevation: 3,
         position: "relative",
     },
-    highlightBadge: {
-        position: "absolute",
-        top: 0,
-        right: 0,
-        backgroundColor: "#f4511e",
-        paddingHorizontal: 8,
-        paddingVertical: 4,
-        borderTopRightRadius: 12,
-        borderBottomLeftRadius: 8,
-    },
-    highlightText: {
-        color: "white",
-        fontSize: 12,
-        fontWeight: "bold",
-    },
     header: {
         flexDirection: "row",
         justifyContent: "space-between",
@@ -132,6 +102,9 @@ const styles = StyleSheet.create({
         borderRadius: 4,
         marginRight: 8,
         marginBottom: 4,
+    },
+    proposedBadge: {
+        backgroundColor: "#2196F3",
     },
     badgeText: {
         color: "white",

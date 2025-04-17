@@ -96,10 +96,6 @@ const styles = StyleSheet.create({
         alignItems: "center",
         flexDirection: "row",
     },
-    stepContainer: {
-        gap: 8,
-        marginBottom: 8,
-    },
     category: {
         fontSize: 14,
         color: "#666",

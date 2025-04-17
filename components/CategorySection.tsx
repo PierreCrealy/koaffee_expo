@@ -105,11 +105,6 @@ const styles = StyleSheet.create({
     marginBottom: 16,
 
   },
-  title: {
-    fontSize: 18,
-    fontWeight: "bold",
-    color: "#f4511e",
-  },
   emptyContainer: {
     backgroundColor: "white",
     borderRadius: 12,

@@ -1,4 +1,4 @@
-import {StyleSheet, Image, Text, TouchableOpacity, View} from 'react-native';
+import {StyleSheet, Image, Text, TouchableOpacity, View, SectionList} from 'react-native';
 
 import { Collapsible } from '@/components/Collapsible';
 import { ExternalLink } from '@/components/ExternalLink';
@@ -6,36 +6,60 @@ import ParallaxScrollView from '@/components/ParallaxScrollView';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 
-import React, {useEffect, useState} from "react";
+import React, {useCallback, useEffect, useState} from "react";
 
 import * as SecureStore from "expo-secure-store";
-import { useRouter } from "expo-router";
+import {useFocusEffect, useRouter} from "expo-router";
 import { User } from "@/entities/User";
 import Ionicons from "@expo/vector-icons/Ionicons";
+
+import { Order } from "@/entities/Order";
+import OrderCard from "@/components/OrderCard";
 
 export default function ProfileScreen() {
 
     const router = useRouter();
     const [user, setUser] = useState<User>();
+    const [orders, setOrders] = useState<Order[]>([]);
+
+    useFocusEffect(
+        useCallback(() => {
+            const loadUser = async () => {
+                const token = await SecureStore.getItemAsync('userToken');
+                const userInfo = await SecureStore.getItemAsync('userInfo');
+                const userStore = JSON.parse((userInfo) as string);
+
+                setUser(userStore);
+            }
+            const fetchOrders = async () => {
+                await fetch(`https://pass-api.pierre-dev-app.fr/api/v1/order/${user?.id}/group-by-status`)
+                    .then((response) => response.json())
+                    .then(data => {
+                        setOrders(data.orders);
+                    })
+                    .catch((e) => console.log('error : ' + e.message));
+            }
+
+            loadUser();
+            fetchOrders();
+
+        }, [user?.id])
+    );
+
+    const sections = Object.keys(orders).map(status => ({
+        title: status,
+        // @ts-ignore
+        data: orders[status],
+    }));
 
     async function attemptDisconnect()
     {
         await SecureStore.deleteItemAsync('userToken')
+        await SecureStore.deleteItemAsync('userInfo')
+
         router.push('/auth')
     }
 
-
-    useEffect(() => {
-        const loadUser = async () => {
-            const token = await SecureStore.getItemAsync('userToken');
-            const userInfo = await SecureStore.getItemAsync('userInfo');
-            const userStore = JSON.parse((userInfo) as string);
-
-            setUser(userStore);
-        }
-
-        loadUser();
-    }, []);
 
     return (
         <ParallaxScrollView
@@ -58,15 +82,24 @@ export default function ProfileScreen() {
 
 
             <Collapsible title="Commandes">
-                <ThemedText>
-                    For static images, you can use the <ThemedText type="defaultSemiBold">@2x</ThemedText> and{' '}
-                    <ThemedText type="defaultSemiBold">@3x</ThemedText> suffixes to provide files for
-                    different screen densities
-                </ThemedText>
-                <Image source={require('@/assets/images/react-logo.png')} style={{ alignSelf: 'center' }} />
-                <ExternalLink href="https://reactnative.dev/docs/images">
-                    <ThemedText type="link">Learn more</ThemedText>
-                </ExternalLink>
+                <SectionList
+                    scrollEnabled={false}
+                    sections={sections}
+                    keyExtractor={(item) => item.id.toString()}
+                    ListEmptyComponent={<Text style={styles.emptyText}>Aucune commandes passées</Text>}
+                    renderItem={({item}) => (
+
+                        <View style={styles.itemProduct}>
+                            <OrderCard order={item} />
+                        </View>
+
+                    )}
+                    renderSectionHeader={({section}) => (
+                        <Text style={styles.header}>
+                            {section.title}
+                        </Text>
+                    )}
+                />
             </Collapsible>
 
 
@@ -79,6 +112,20 @@ export default function ProfileScreen() {
 }
 
 const styles = StyleSheet.create({
+    header: {
+        marginTop: 60,
+        fontSize: 32,
+        backgroundColor: '#fff',
+    },
+    emptyText: {
+        fontSize: 16,
+        color: "#555",
+        textAlign: "center",
+        marginTop: 50,
+    },
+    itemProduct: {
+        marginBottom: 40,
+    },
     textBtn: {
         fontSize: 18,
         textAlign: 'center',
@@ -108,12 +155,6 @@ const styles = StyleSheet.create({
         alignSelf: 'center',
         justifyContent: 'space-between',
 
-    },
-    headerImage: {
-        color: '#808080',
-        bottom: -90,
-        left: -35,
-        position: 'absolute',
     },
     reactLogo: {
         width: '100%',

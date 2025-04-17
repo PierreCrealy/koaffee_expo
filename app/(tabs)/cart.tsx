@@ -5,26 +5,25 @@ import {
     TouchableOpacity
 } from 'react-native';
 
-import {HelloWave} from '@/components/HelloWave';
 import ParallaxScrollView from '@/components/ParallaxScrollView';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
+import CartSection from "@/components/CartSection";
 
-import * as Notifications from 'expo-notifications';
 import * as SecureStore from "expo-secure-store";
 
-import React, { useCallback, useContext, useEffect } from "react";
+import React, { useCallback, useContext } from "react";
+import { useFocusEffect, useRouter } from "expo-router";
 
 import { Product } from "@/entities/Product";
 import { User } from "@/entities/User";
-
-import CartSection from "@/components/CartSection";
 
 import { CartContext } from "@/contexts/CartContext";
 import Ionicons from "@expo/vector-icons/Ionicons";
 
 import { CountriesBonus } from "@/usefuls/CountriesBonus";
-import { useRouter } from "expo-router";
+import SendNotification from "@/usefuls/SendNotification";
+
 
 
 export default function CartScreen() {
@@ -36,23 +35,26 @@ export default function CartScreen() {
     const [user, setUser] = React.useState<User>();
     const [location, setLocation] = React.useState();
 
-    useEffect(() => {
-        const loadUser = async () => {
-            const token = await SecureStore.getItemAsync('userToken');
-            const userInfo = await SecureStore.getItemAsync('userInfo');
-            const userSec = JSON.parse((userInfo) as string);
+    useFocusEffect(
+        useCallback(() => {
+            const loadUser = async () => {
+                const token = await SecureStore.getItemAsync('userToken');
+                const userInfo = await SecureStore.getItemAsync('userInfo');
+                const userSec = JSON.parse((userInfo) as string);
 
-            setUser(userSec);
-        }
-        const loadLocation = async () => {
-            const locationSec = await SecureStore.getItemAsync('location');
-            // @ts-ignore
-            setLocation(locationSec)
-        }
+                setUser(userSec);
+            }
+            const loadLocation = async () => {
+                const locationSec = await SecureStore.getItemAsync('location');
+                // @ts-ignore
+                setLocation(locationSec)
+            }
 
-        loadLocation()
-        loadUser();
-    }, []);
+            loadLocation()
+            loadUser();
+
+        }, [user?.id])
+    );
 
     const getTotalWithBonus = () => {
 
@@ -76,6 +78,7 @@ export default function CartScreen() {
             fidelityPtsEarned: fidelityPts,
             userId: user?.id,
             productIds: `{${cartProductsIds}}`,
+            method: 2,
         }
 
         try{
@@ -90,10 +93,21 @@ export default function CartScreen() {
                 }
             );
 
+            // const text = await response.text(); // pour debug
+            // console.log('Raw response:', JSON.stringify(text));
+            //
+            // const data = JSON.parse(text); // on parse manuellement
+            // console.log('Parsed JSON:', JSON.stringify(data));
+
+            SendNotification({
+                title: 'Commande passée, merci !',
+                body: `Votre commande est en cours de préparation.`,
+                data: {extraData: ''}
+            })
+
             cleanCart();
             router.push('/(tabs)')
 
-            //const data = await response.json()
 
         }catch(e){
             // @ts-ignore
@@ -114,12 +128,11 @@ export default function CartScreen() {
             }>
             <ThemedView style={styles.titleContainer}>
                 <ThemedText type="title">Panier</ThemedText>
-                <HelloWave/>
             </ThemedView>
 
 
             <ThemedView style={styles.stepContainer}>
-                <CartSection products={cartProducts} total={getTotalWithBonus()} />
+                <CartSection products={cartProducts} total={getTotalWithBonus()} bonus={CountriesBonus[location]} />
             </ThemedView>
 
 
@@ -167,63 +180,14 @@ const styles = StyleSheet.create({
         gap: 8,
         marginBottom: 8,
     },
-    cartContainer: {
-        height: 50,
-        gap: 8,
-        marginBottom: 8,
-    },
     reactLogo: {
         width: '100%',
         height: '100%',
-    },
-    item: {
-        flexDirection: 'row',
-        backgroundColor: '#A1CEDC',
-        padding: 20,
-        marginVertical: 8,
-        borderRadius: 8,
-    },
-    header: {
-        fontSize: 25,
-        fontWeight: 'bold',
-        marginTop: 15,
-        backgroundColor: '#fff',
-    },
-    title: {
-        fontSize: 20,
-    },
-    imageItem: {
-        height: 50,
-        width: 50,
-        bottom: 0,
-        right: 0,
-        position: 'absolute',
-    },
-    itemProduct: {
-        marginBottom: 40,
-    },
-    actionItemProduct: {
-        alignItems: 'flex-end',
     },
     textBtn: {
         fontSize: 18,
         textAlign: 'center',
         fontWeight: 'bold',
         color: 'white',
-    },
-    list: {
-        padding: 16,
-    },
-    centered: {
-        flex: 1,
-        justifyContent: "center",
-        alignItems: "center",
-        padding: 20,
-    },
-    emptyText: {
-        fontSize: 16,
-        color: "#555",
-        textAlign: "center",
-        marginTop: 50,
     },
 });

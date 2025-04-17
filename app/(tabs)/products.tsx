@@ -5,28 +5,43 @@ import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import ProductCard from "@/components/ProductCard";
 
-import React, {useContext, useEffect, useState} from "react";
+import React, {useCallback, useContext, useEffect, useState} from "react";
 
 import { Product } from "@/entities/Product";
 
 import { CartContext } from "@/contexts/CartContext";
+import {useFocusEffect} from "expo-router";
+import {User} from "@/entities/User";
+import * as SecureStore from "expo-secure-store";
 
 export default function ProductsScreen() {
 
     const [products, setProducts] = useState<Product[]>([]);
+    const [user, setUser] = React.useState<User>();
 
-    useEffect(() => {
-        const fetchProducts = async () => {
-            fetch('https://pass-api.pierre-dev-app.fr/api/v1/product/group-by-category')
-                .then((response) => response.json())
-                .then(data => {
-                    setProducts(data.products);
-                })
-                .catch((e) => alert('error : ' + e.message));
-        }
+    useFocusEffect(
+        useCallback(() => {
+            const fetchProducts = async () => {
+                fetch('https://pass-api.pierre-dev-app.fr/api/v1/product/group-by-category')
+                    .then((response) => response.json())
+                    .then(data => {
+                        setProducts(data.products);
+                    })
+                    .catch((e) => alert('error : ' + e.message));
+            }
+            const loadUser = async () => {
+                const token = await SecureStore.getItemAsync('userToken');
+                const userInfo = await SecureStore.getItemAsync('userInfo');
+                const userSec = JSON.parse((userInfo) as string);
 
-        fetchProducts();
-    }, []);
+                setUser(userSec);
+            }
+
+            fetchProducts();
+            loadUser();
+
+        }, [user?.id])
+    );
 
     // @ts-ignore
     const { addToCart, cartProducts } = useContext(CartContext);
@@ -124,25 +139,9 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         fontWeight: 'bold',
     },
-    list: {
-        padding: 16,
-    },
-    item: {
-        flexDirection: 'row',
-        backgroundColor: '#A1CEDC',
-        padding: 20,
-        marginVertical: 8,
-        borderRadius: 8,
-    },
     reactLogo: {
         width: '100%',
         height: '100%',
-    },
-    headerImage: {
-        color: '#808080',
-        bottom: -90,
-        left: -35,
-        position: 'absolute',
     },
     titleContainer: {
         flexDirection: 'row',

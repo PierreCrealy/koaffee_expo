@@ -68,25 +68,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
   },
-  button: {
-    width: 28,
-    height: 28,
-    borderRadius: 14,
-    backgroundColor: "#f0f0f0",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  buttonText: {
-    fontSize: 16,
-    fontWeight: "bold",
-  },
-  quantity: {
-    marginHorizontal: 8,
-    fontSize: 14,
-    fontWeight: "500",
-    minWidth: 20,
-    textAlign: "center",
-  },
 })
 
 export default CartItem

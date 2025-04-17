@@ -1,6 +1,6 @@
 import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
 import { useFonts } from 'expo-font';
-import { Stack } from 'expo-router';
+import {Stack, useNavigation, useRouter} from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import React, { useEffect, useState } from 'react';
@@ -27,9 +27,14 @@ Notifications.setNotificationHandler({
 });
 
 import { Structures } from "@/usefuls/Structures";
+import {User} from "@/entities/User";
 
 export default function RootLayout() {
+  const router = useRouter();
+
   const [location, setLocation] = useState(undefined);
+  const [user, setUser] = useState<User | null>(null);
+
   const colorScheme = useColorScheme();
   const [loaded] = useFonts({
     SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
@@ -56,20 +61,32 @@ export default function RootLayout() {
       }
 
       let locations = await Location.getCurrentPositionAsync();
-      console.log(locations);
       // @ts-ignore
       setLocation(locations);
 
       const { latitude, longitude } = locations.coords;
       const geoCode = await Location.reverseGeocodeAsync({latitude, longitude})
-      console.log(geoCode);
 
       const { isoCountryCode } = geoCode[0];
       await SecureStore.setItemAsync('location', (isoCountryCode != null ? isoCountryCode : 'FR'));
 
     }
+    async function getUserConnected(){
+      const token = await SecureStore.getItemAsync('userToken');
+      const userInfo = await SecureStore.getItemAsync('userInfo');
+      const userStore = JSON.parse((userInfo) as string);
+
+      if(userStore != null)
+      {
+        setUser(userStore);
+        router.push('/(tabs)')
+      }else{
+        router.push('/auth');
+      }
+    }
 
     getCurrentLocation();
+    getUserConnected();
   }, []);
 
 
