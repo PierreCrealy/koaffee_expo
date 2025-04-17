@@ -46,7 +46,7 @@ export default function ProductsScreen() {
                 setProducts(data.products);
                 setLoading(false);
             })
-            .catch((e) => alert('error : ' + e.message));
+            .catch((e) => console.log('error : ' + e.message));
     }
     const loadUser = async () => {
         const tokenSec = await SecureStore.getItemAsync('userToken');

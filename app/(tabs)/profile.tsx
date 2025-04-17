@@ -6,7 +6,7 @@ import ParallaxScrollView from '@/components/ParallaxScrollView';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 
-import React, {useCallback, useEffect, useState} from "react";
+import React, {useCallback, useContext, useEffect, useState} from "react";
 
 import * as SecureStore from "expo-secure-store";
 import {useFocusEffect, useRouter} from "expo-router";
@@ -15,8 +15,17 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 
 import { Order } from "@/entities/Order";
 import OrderCard from "@/components/OrderCard";
+import {CartContext} from "@/contexts/CartContext";
+import {UserContext} from "@/contexts/UserContext";
 
 export default function ProfileScreen() {
+
+    // @ts-ignore
+    const { cleanCart } = useContext(CartContext);
+
+    // @ts-ignore
+    const { disconnectUser } = useContext(UserContext);
+
 
     const router = useRouter();
     const [user, setUser] = useState<User>();
@@ -67,8 +76,10 @@ export default function ProfileScreen() {
     {
         await SecureStore.deleteItemAsync('userToken')
         await SecureStore.deleteItemAsync('userInfo')
+        cleanCart()
+        disconnectUser()
 
-        router.push('/auth')
+        router.replace('/auth')
     }
 
     return (

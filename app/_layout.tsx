@@ -3,7 +3,7 @@ import { useFonts } from 'expo-font';
 import {Stack, useNavigation, useRouter} from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
-import React, { useEffect, useState } from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import 'react-native-reanimated';
 
 import { useColorScheme } from '@/hooks/useColorScheme';
@@ -28,6 +28,7 @@ Notifications.setNotificationHandler({
 
 import {User} from "@/entities/User";
 import StructuretBubble from "@/components/StructureBubble";
+import {UserContext, UserProvider} from "@/contexts/UserContext";
 
 export default function RootLayout() {
   const router = useRouter();
@@ -40,6 +41,8 @@ export default function RootLayout() {
     SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
   });
 
+  // @ts-ignore
+  // const { user, token } = useContext(UserContext);
 
   useEffect(() => {
     const requestPermissions = async () => {
@@ -71,22 +74,9 @@ export default function RootLayout() {
       await SecureStore.setItemAsync('location', (isoCountryCode != null ? isoCountryCode : 'FR'));
 
     }
-    async function getUserConnected(){
-      const token = await SecureStore.getItemAsync('userToken');
-      const userInfo = await SecureStore.getItemAsync('userInfo');
-      const userStore = JSON.parse((userInfo) as string);
-
-      if(userStore != null)
-      {
-        setUser(userStore);
-        router.push('/(tabs)')
-      }else{
-        router.push('/auth');
-      }
-    }
 
     getCurrentLocation();
-    getUserConnected();
+
   }, []);
 
 
@@ -103,20 +93,21 @@ export default function RootLayout() {
 
   return (
       <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-        <CartProvider>
+        <UserProvider>
+          <CartProvider>
 
-          <StructuretBubble />
+            <StructuretBubble />
 
-          <Stack screenOptions={{ headerShown: false }}>
+            <Stack screenOptions={{ headerShown: false }}>
 
-            <Stack.Screen name="auth/index" />
-            <Stack.Screen name="+not-found" />
+              <Stack.Screen name="auth/index" />
+              <Stack.Screen name="+not-found" />
 
-          </Stack>
+            </Stack>
 
-          <StatusBar style="auto" />
-      </CartProvider>
-
+            <StatusBar style="auto" />
+          </CartProvider>
+        </UserProvider>
     </ThemeProvider>
   );
 }

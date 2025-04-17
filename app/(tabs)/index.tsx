@@ -1,5 +1,5 @@
 import {ActivityIndicator, Button, Image, StyleSheet, View,} from 'react-native';
-import React, {useCallback, useEffect} from "react";
+import React, {useCallback, useContext, useEffect} from "react";
 
 import {HelloWave} from '@/components/HelloWave';
 import ParallaxScrollView from '@/components/ParallaxScrollView';
@@ -7,46 +7,41 @@ import {ThemedText} from '@/components/ThemedText';
 import {ThemedView} from '@/components/ThemedView';
 import CategorySection from "@/components/CategorySection";
 
-import {User} from "@/entities/User";
 import {Order} from "@/entities/Order";
 
 import {Categories} from "@/constants/Categories";
 
 import * as SecureStore from "expo-secure-store";
 
-import MapView, {Marker} from "react-native-maps";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import OrderProgress from "@/components/OrderProgress";
-import {useFocusEffect} from "expo-router";
+import {useFocusEffect, useRouter} from "expo-router";
+import {UserContext} from "@/contexts/UserContext";
 
 export default function HomeScreen() {
 
     const [categories, setCategories] = React.useState<string[]>([]);
-    const [user, setUser] = React.useState<User>();
     const [location, setLocation] = React.useState();
     const [order, setOrder] = React.useState<Order>();
-    const [token, setToken] = React.useState<string>();
 
     const [loading, setLoading] = React.useState(false);
 
+    const router = useRouter();
+
+    // @ts-ignore
+    const { user, token } = useContext(UserContext);
+
     useFocusEffect(
         useCallback(() => {
-
-        }, [user?.id])
+            if(!user)
+            {
+                router.replace("/auth");
+            }
+        }, [user])
     );
+
     useFocusEffect(
         useCallback(() => {
-            const loadUser = async () => {
-                const tokenSec = await SecureStore.getItemAsync('userToken');
-                const userInfo = await SecureStore.getItemAsync('userInfo');
-
-                const userSec = JSON.parse(userInfo as string);
-                setUser(userSec);
-                setToken((tokenSec) as string);
-
-                latestProgressUserOrder();
-            };
-
             const loadLocation = async () => {
                 const locationSec = await SecureStore.getItemAsync('location');
                 // @ts-ignore
@@ -71,7 +66,7 @@ export default function HomeScreen() {
             };
 
             loadLocation();
-            loadUser();
+            latestProgressUserOrder();
 
             setCategories(Categories);
 

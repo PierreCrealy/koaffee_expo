@@ -4,16 +4,21 @@ import { HelloWave } from '@/components/HelloWave';
 import ParallaxScrollView from '@/components/ParallaxScrollView';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
-import React from "react";
+import React, {useContext} from "react";
 
 import * as SecureStore from "expo-secure-store";
 import { useRouter } from "expo-router";
 import Ionicons from "@expo/vector-icons/Ionicons";
+import {UserContext} from "@/contexts/UserContext";
+import { User } from '@/entities/User';
 
 export default function AuthScreen() {
 
     const [email, setEmail] = React.useState('');
     const [password, setPassword] = React.useState('');
+
+    // @ts-ignore
+    const { user, connectUser } = useContext(UserContext);
 
     const router = useRouter();
 
@@ -44,8 +49,19 @@ export default function AuthScreen() {
             // @ts-ignore
             await SecureStore.setItemAsync('userInfo', JSON.stringify({ id: data.success.id, name: data.success.name, email: data.success.email }))
 
+            console.log(JSON.stringify({ id: data.success.id, email: data.success.email, name: data.success.name }))
+
+            const userC: User = {
+                id: data.success.id,
+                email: data.success.email,
+                name: data.success.name,
+            };
+
+            connectUser({ user: userC, token: data.success.token})
+
             // alert("Store token : " + await SecureStore.getItemAsync('token'))
             // alert('Connexion réussi.')
+
 
             router.push('/(tabs)')
 
