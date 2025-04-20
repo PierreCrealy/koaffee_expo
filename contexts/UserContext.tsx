@@ -6,8 +6,8 @@ import {User} from "@/entities/User";
 export const UserContext = createContext();
 
 export const UserProvider = ({ children }: { children: any }) => {
-    const [user, setUser] = useState<User | null | undefined>();
-    const [token, setToken] = useState<string | null | undefined>();
+    const [user, setUser] = useState<User | null>(null);
+    const [token, setToken] = useState<string | null>(null);
 
 
     const connectUser = ({user, token}: {user: User, token: string}) => {

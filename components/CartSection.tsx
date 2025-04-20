@@ -4,6 +4,7 @@ import CartItem from "./CartItem"
 import { Product } from "@/entities/Product";
 import {useContext} from "react";
 import {CartContext} from "@/contexts/CartContext";
+import {Colors} from "@/constants/Colors";
 
 const CartSection = ({products, total, bonus}: {products: Product[], total: number, bonus: number}) => {
 
@@ -21,7 +22,7 @@ const CartSection = ({products, total, bonus}: {products: Product[], total: numb
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.title}>Panier</Text>
+        <Text style={styles.title}>Résumé</Text>
         <TouchableOpacity onPress={() => cleanCart()}>
           <Text style={styles.clearButton}>Nettoyer</Text>
         </TouchableOpacity>
@@ -52,7 +53,7 @@ export default CartSection
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: "white",
+    backgroundColor: Colors.primary.main,
     borderRadius: 12,
     padding: 16,
     marginBottom: 16,
@@ -74,11 +75,11 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 18,
     fontWeight: "bold",
-    color: "#f4511e",
+    color: Colors.neutral[700],
   },
   clearButton: {
     fontSize: 14,
-    color: "#888",
+    color: Colors.neutral[500],
   },
   footer: {
     flexDirection: "row",
@@ -92,10 +93,12 @@ const styles = StyleSheet.create({
   totalText: {
     fontSize: 16,
     fontWeight: "bold",
+    color: Colors.neutral[500],
   },
   bonusText: {
     fontSize: 16,
     fontStyle: "italic",
+    color: Colors.primary.light,
   },
   emptyContainer: {
     backgroundColor: "white",

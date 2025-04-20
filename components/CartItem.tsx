@@ -2,6 +2,7 @@ import { StyleSheet, View, Text, TouchableOpacity } from "react-native"
 import {Product} from "@/entities/Product";
 import {useContext} from "react";
 import {CartContext} from "@/contexts/CartContext";
+import {Colors} from "@/constants/Colors";
 
 const CartItem = ({ product }: {product: Product}) => {
 
@@ -44,7 +45,7 @@ const styles = StyleSheet.create({
     width: 36,
     height: 36,
     borderRadius: 18,
-    backgroundColor: "#f4511e",
+    backgroundColor: Colors.neutral[700],
     justifyContent: "center",
     alignItems: "center",
   },
@@ -59,6 +60,7 @@ const styles = StyleSheet.create({
   name: {
     fontSize: 16,
     fontWeight: "500",
+    color: Colors.neutral[500],
   },
   price: {
     fontSize: 14,

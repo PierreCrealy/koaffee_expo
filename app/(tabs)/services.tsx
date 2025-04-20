@@ -5,7 +5,7 @@ import {
     TouchableOpacity,
     Text,
     SectionList,
-    ActivityIndicator, Animated, FlatList,
+    ActivityIndicator, FlatList,
 } from 'react-native';
 
 import ParallaxScrollView from '@/components/ParallaxScrollView';
@@ -15,17 +15,17 @@ import ProductCard from "@/components/ProductCard";
 
 import React, {useCallback, useContext, useEffect, useState} from "react";
 
-import { Product } from "@/entities/Product";
+import { Service } from "@/entities/Service";
 
 import { CartContext } from "@/contexts/CartContext";
 import {useFocusEffect} from "expo-router";
-import {User} from "@/entities/User";
+import { User } from "@/entities/User";
 import * as SecureStore from "expo-secure-store";
-import ScrollView = Animated.ScrollView;
+import ServiceCard from "@/components/ServiceCard";
 
-export default function ProductsScreen() {
+export default function ServicesScreen() {
 
-    const [products, setProducts] = useState<Product[]>([]);
+    const [services, setServices] = useState<Service[]>([]);
     const [user, setUser] = React.useState<User>();
     const [token, setToken] = React.useState<string>();
     const [loading, setLoading] = React.useState(false);
@@ -33,9 +33,10 @@ export default function ProductsScreen() {
     // @ts-ignore
     const { addToCart, cartProducts } = useContext(CartContext);
 
-    const fetchProducts = async () => {
+    const fetchServices = async () => {
         setLoading(true);
-        fetch('https://koaffee-api.pierre-dev-app.fr/api/v1/product/group-by-category', {
+
+        fetch('https://koaffee-api.pierre-dev-app.fr/api/v1/service', {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
@@ -44,7 +45,7 @@ export default function ProductsScreen() {
         })
             .then((response) => response.json())
             .then(data => {
-                setProducts(data.products);
+                setServices(data.services);
                 setLoading(false);
             })
             .catch((e) => console.log('error : ' + e.message));
@@ -58,16 +59,10 @@ export default function ProductsScreen() {
         setToken((tokenSec) as string);
     }
 
-    const sections = Object.keys(products).map(category => ({
-        title: category,
-        // @ts-ignore
-        data: products[category],
-    }));
-
 
     useFocusEffect(
         useCallback(() => {
-            fetchProducts();
+            fetchServices();
             loadUser();
 
         }, [user?.id])
@@ -84,41 +79,29 @@ export default function ProductsScreen() {
             }
         >
             <ThemedView style={styles.titleContainer}>
-                <ThemedText type="title">Tous nos produits</ThemedText>
+                <ThemedText type="title">Tous nos services</ThemedText>
             </ThemedView>
-            <ThemedText>Voici une liste de tous nos produits disponible, organisé par catégorie.</ThemedText>
+            <ThemedText>Voici une liste de tous nos services proposés.</ThemedText>
 
 
             {loading ? (
                 <ActivityIndicator size="large" color="#B3D8DE" />
             ) : (
                 <ThemedView>
-                    <SectionList
+                    <FlatList
                         scrollEnabled={false}
-                        sections={sections}
+                        data={services}
                         keyExtractor={(item) => item.id.toString()}
-                        ListEmptyComponent={<Text style={styles.emptyText}>Aucun produit disponible</Text>}
-                        renderItem={({item}) => (
-                            <View style={styles.itemProduct}>
-                                <ProductCard product={item} />
-                            </View>
-                        )}
-                        renderSectionHeader={({section}) => (
-                            <ThemedView style={styles.titleContainer}>
-                                <ThemedText type="title" style={styles.header}>{ section.title}</ThemedText>
-                            </ThemedView>
-                        )}
-                    />
+                        renderItem={({ item }) =>
+                            (
+                                <View style={styles.itemProduct}>
+                                    <ServiceCard service={item} />
+                                </View>
 
-                    {/*<ScrollView*/}
-                    {/*    horizontal*/}
-                    {/*    showsHorizontalScrollIndicator={false}*/}
-                    {/*    contentContainerStyle={styles.featuredContainer}*/}
-                    {/*>*/}
-                    {/*    {products.map((product) => (*/}
-                    {/*        <ProductCard key={product.id} product={product} />*/}
-                    {/*    ))}*/}
-                    {/*</ScrollView>*/}
+                            )}
+                        //contentContainerStyle={styles.list}
+                        ListEmptyComponent={<Text style={styles.emptyText}>Aucun service disponible</Text>}
+                    />
                 </ThemedView>
             )}
 
@@ -127,11 +110,6 @@ export default function ProductsScreen() {
 }
 
 const styles = StyleSheet.create({
-    featuredContainer: {
-        paddingHorizontal: 16,
-        paddingTop: 8,
-        paddingBottom: 16,
-    },
     title: {
         fontSize: 24,
     },

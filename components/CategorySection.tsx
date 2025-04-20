@@ -1,8 +1,9 @@
-import {StyleSheet, View, Text, FlatList, TouchableOpacity, Image} from "react-native"
+import {StyleSheet, View, Text, FlatList, TouchableOpacity, Image, Animated} from "react-native"
 
 import CartItem from "./CartItem"
 import React from "react";
 import { useRouter} from "expo-router";
+import ScrollView = Animated.ScrollView;
 
 const CategorySection = ({categories}: {categories: string[]}) => {
 
@@ -24,29 +25,27 @@ const CategorySection = ({categories}: {categories: string[]}) => {
   return (
     <View style={styles.container}>
 
-      <FlatList
-          data={categories}
-          numColumns={2}
-          keyExtractor={(item) => item}
-          scrollEnabled={false}
-          columnWrapperStyle={styles.columnWrapper}
-          contentContainerStyle={styles.list}
-          renderItem={({ item }) => (
+      <ScrollView
+          scrollEnabled={true}
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.featuredContainer}
+      >
+        {categories.map((category) => (
+            <TouchableOpacity key={category} style={[styles.categoryCard]} onPress={() => productsCategory(category)}>
+              <Image
+                  source={require('@/assets/images/cart_icon.jpg')}
+                  style={styles.categoryImage}
+              />
 
-              <TouchableOpacity style={[styles.categoryCard]} onPress={() => productsCategory(item)}>
+              <View style={[styles.badge]}>
+                <Text style={styles.badgeText}>{category}</Text>
+              </View>
 
-                <Image
-                    source={require('@/assets/images/meal_3.png')}
-                    style={styles.categoryImage}
-                />
+            </TouchableOpacity>
 
-                <View style={[styles.badge]}>
-                  <Text style={styles.badgeText}>{item}</Text>
-                </View>
-
-              </TouchableOpacity>
-          )}
-      />
+        ))}
+      </ScrollView>
 
     </View>
   )
@@ -55,11 +54,10 @@ const CategorySection = ({categories}: {categories: string[]}) => {
 export default CategorySection
 
 const styles = StyleSheet.create({
-  list: {
-    paddingVertical: 4,
-  },
-  columnWrapper: {
-    justifyContent: "space-evenly",
+  featuredContainer: {
+    gap: 50,
+    paddingTop: 8,
+    paddingBottom: 16,
   },
   badge: {
     zIndex: 1,

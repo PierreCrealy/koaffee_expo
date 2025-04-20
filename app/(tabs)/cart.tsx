@@ -23,6 +23,7 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 
 import { CountriesBonus } from "@/constants/CountriesBonus";
 import SendNotification from "@/usefuls/SendNotification";
+import {Colors} from "@/constants/Colors";
 
 
 
@@ -85,7 +86,7 @@ export default function CartScreen() {
 
         try{
             const response = await fetch(
-                'https://pass-api.pierre-dev-app.fr/api/v1/order',
+                'https://koaffee-api.pierre-dev-app.fr/api/v1/order',
                 {
                     method: 'POST',
                     headers: {
@@ -122,10 +123,10 @@ export default function CartScreen() {
 
     return (
         <ParallaxScrollView
-            headerBackgroundColor={{light: '#A1CEDC', dark: '#1D3D47'}}
+            headerBackgroundColor={{light: Colors.primary.light, dark: Colors.primary.dark}}
             headerImage={
                 <Image
-                    source={require('@/assets/images/bar.png')}
+                    source={require('@/assets/images/cart_icon.jpg')}
                     style={styles.reactLogo}
                 />
             }>
@@ -153,7 +154,7 @@ const styles = StyleSheet.create({
     orderBtn: {
         width: '80%',
 
-        backgroundColor: '#4CAF50',
+        backgroundColor: Colors.success.light,
         borderRadius: 8,
 
         paddingVertical: 8,

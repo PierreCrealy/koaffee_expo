@@ -18,6 +18,8 @@ import OrderCard from "@/components/OrderCard";
 import {CartContext} from "@/contexts/CartContext";
 import {UserContext} from "@/contexts/UserContext";
 
+import { Colors } from "@/constants/Colors";
+
 export default function ProfileScreen() {
 
     // @ts-ignore
@@ -45,7 +47,7 @@ export default function ProfileScreen() {
             }
             const fetchOrders = async () => {
                 setLoading(true);
-                await fetch(`https://pass-api.pierre-dev-app.fr/api/v1/order/${user?.id}/group-by-status`, {
+                await fetch(`https://koaffee-api.pierre-dev-app.fr/api/v1/order/${user?.id}/group-by-status`, {
                     method: 'GET',
                     headers: {
                         'Content-Type': 'application/json',
@@ -84,7 +86,7 @@ export default function ProfileScreen() {
 
     return (
         <ParallaxScrollView
-            headerBackgroundColor={{ light: '#D0D0D0', dark: '#353636' }}
+            headerBackgroundColor={{ light: '#FFFFFF', dark: '#353636' }}
             headerImage={
                 <Image
                     source={require('@/assets/images/coffee.png')}
@@ -104,7 +106,7 @@ export default function ProfileScreen() {
 
 
             <TouchableOpacity style={styles.disconnectBtn}  onPress={() => attemptDisconnect()} >
-                <Text style={styles.textBtn}>Se déconnecter</Text><Ionicons name="log-out" size={32} color="#f4511e" />
+                <Text style={styles.textBtn}>Se déconnecter</Text><Ionicons name="log-out" size={32} color={Colors.neutral[700]} />
             </TouchableOpacity>
 
             <Collapsible title="Commandes">
@@ -156,12 +158,12 @@ const styles = StyleSheet.create({
         fontSize: 18,
         textAlign: 'center',
         fontWeight: 'bold',
-        color: '#f4511e',
+        color: Colors.neutral[700],
     },
     disconnectBtn: {
         width: '80%',
 
-        backgroundColor: '#FFE1C9',
+        backgroundColor: Colors.primary.light,
         borderRadius: 8,
 
         paddingVertical: 8,

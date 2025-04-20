@@ -1,32 +1,39 @@
-import { StyleSheet, View, Text, FlatList, TouchableOpacity } from "react-native"
-import React from "react";
+import {StyleSheet, View, Text, FlatList, TouchableOpacity, ActivityIndicator, SectionList} from "react-native"
+import React, {useContext} from "react";
 
 import Ionicons from '@expo/vector-icons/Ionicons';
 import {useRouter} from "expo-router";
+import {UserContext} from "@/contexts/UserContext";
 
 import { Colors } from "@/constants/Colors";
 
 
-const StructuretBubble = () => {
+const LikedBubble = () => {
 
     const router = useRouter();
 
+    // @ts-ignore
+    const { user } = useContext(UserContext);
+
     async function navigateToStructurePage()
     {
-        router.navigate('/structure')
+        router.navigate('/liked')
     }
 
-
     return (
-        <View style={styles.container}>
-            <TouchableOpacity onPress={navigateToStructurePage}>
-                <Ionicons name="storefront" size={32} color={Colors.primary.light} />
-            </TouchableOpacity>
-        </View>
+
+        user ? (
+            <View style={styles.container}>
+                <TouchableOpacity onPress={navigateToStructurePage}>
+                    <Ionicons name="heart" size={32} color="#F04729" />
+                </TouchableOpacity>
+            </View>
+        ) : null
+
     )
 }
 
-export default StructuretBubble
+export default LikedBubble
 
 const styles = StyleSheet.create({
     container: {

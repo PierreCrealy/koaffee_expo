@@ -11,6 +11,9 @@ import { useRouter } from "expo-router";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import {UserContext} from "@/contexts/UserContext";
 import { User } from '@/entities/User';
+import { Colors } from "@/constants/Colors";
+
+import * as Notification from "expo-notifications";
 
 export default function AuthScreen() {
 
@@ -33,7 +36,7 @@ export default function AuthScreen() {
             }
 
             const response = await fetch(
-                'https://pass-api.pierre-dev-app.fr/api/v1/login',
+                'https://koaffee-api.pierre-dev-app.fr/api/v1/login',
                 {
                     method: 'POST',
                     headers: {
@@ -62,7 +65,6 @@ export default function AuthScreen() {
             // alert("Store token : " + await SecureStore.getItemAsync('token'))
             // alert('Connexion réussi.')
 
-
             router.push('/(tabs)')
 
         }catch(e){
@@ -85,7 +87,7 @@ export default function AuthScreen() {
           headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
           headerImage={
             <Image
-              source={require('@/assets/images/pass_logo.png')}
+              source={require('@/assets/images/koaffee_logo.png')}
               style={styles.reactLogo}
             />
           }>
@@ -97,21 +99,23 @@ export default function AuthScreen() {
           <ThemedView style={styles.formContainer}>
 
               <View style={styles.inputContainer}>
-                  <Ionicons name="person" size={32} color="#f4511e" />
+                  <Ionicons name="person" size={32} color={Colors.primary.light} />
                   <TextInput
                       onChangeText={(text) => setEmail(text)}
                       value={email}
-                      placeholder="Enter login"
+                      placeholder="Votre adresse e-mail"
+                      placeholderTextColor={Colors.neutral[500]}
                       style={styles.textInput}
                   />
               </View>
 
               <View style={styles.inputContainer}>
-                  <Ionicons name="keypad" size={32} color="#f4511e" />
+                  <Ionicons name="keypad" size={32} color={Colors.primary.light} />
                   <TextInput
                       onChangeText={(text) => setPassword(text)}
                       value={password}
-                      placeholder="Enter password"
+                      placeholder="Votre mot de passe"
+                      placeholderTextColor={Colors.neutral[500]}
                       secureTextEntry={true}
                       style={styles.textInput}
                   />
@@ -119,11 +123,11 @@ export default function AuthScreen() {
 
               <View style={styles.buttonContainer}>
                   <TouchableOpacity style={styles.connexionBtn}  onPress={() => attemptConnexion()} >
-                      <Text style={styles.textBtn}>Connexion</Text><Ionicons name="log-in" size={32} color="#f4511e" />
+                      <Text style={styles.textBtn}>Connexion</Text><Ionicons name="log-in" size={32} color={Colors.neutral[500]} />
                   </TouchableOpacity>
 
                   <TouchableOpacity style={styles.registerBtn}  onPress={() => alert("Indisponible")} >
-                      <Text style={styles.textBtn}>Inscription</Text><Ionicons name="arrow-down" size={32} color="#f4511e" />
+                      <Text style={styles.textBtn}>Inscription</Text><Ionicons name="arrow-down" size={32} color={Colors.neutral[500]} />
                   </TouchableOpacity>
               </View>
 
@@ -133,7 +137,7 @@ export default function AuthScreen() {
                       <Text style={styles.textBtn}>User 1</Text>
                   </TouchableOpacity>
 
-                  <TouchableOpacity style={styles.registerBtn}  onPress={() => setUserTwoForm()} >
+                  <TouchableOpacity style={styles.connexionBtn}  onPress={() => setUserTwoForm()} >
                       <Text style={styles.textBtn}>User 2</Text>
                   </TouchableOpacity>
               </View>
@@ -147,6 +151,7 @@ export default function AuthScreen() {
 const styles = StyleSheet.create({
     textInput: {
         fontSize: 18,
+        color: Colors.neutral[700],
     },
     inputContainer: {
         flexDirection: 'row',
@@ -171,10 +176,10 @@ const styles = StyleSheet.create({
         fontSize: 18,
         textAlign: 'center',
         fontWeight: 'bold',
-        color: '#f4511e',
+        color: Colors.neutral[700],
     },
     connexionBtn: {
-        backgroundColor: '#FFE1C9',
+        backgroundColor: Colors.primary.light,
         borderRadius: 8,
 
         paddingVertical: 8,
@@ -194,7 +199,7 @@ const styles = StyleSheet.create({
 
     },
     registerBtn: {
-        backgroundColor: '#FFF7F0',
+        backgroundColor: Colors.primary.light,
         borderRadius: 8,
 
         paddingVertical: 8,
@@ -215,6 +220,7 @@ const styles = StyleSheet.create({
     },
     titleContainer: {
         flexDirection: 'row',
+        justifyContent: 'center',
         alignItems: 'center',
         gap: 8,
     },

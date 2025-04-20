@@ -11,7 +11,7 @@ export default function OrderCard ({ order }: {order: Order}) {
 
             <View style={styles.productCard}>
                 <Image
-                    source={require('@/assets/images/meal_5.png')}
+                    source={require('@/assets/images/cart_icon.jpg')}
                     style={styles.productImage}
                 />
 

@@ -5,14 +5,19 @@ import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import React, {useContext, useEffect, useState} from 'react';
 import 'react-native-reanimated';
+import {StyleSheet, View} from "react-native";
 
 import { useColorScheme } from '@/hooks/useColorScheme';
-import LogoutBubble from "@/components/LogoutBubble";
 import {CartProvider} from "@/contexts/CartContext";
+import {UserContext, UserProvider} from "@/contexts/UserContext";
 
 import * as SecureStore from "expo-secure-store";
 import * as Notifications from "expo-notifications";
 import * as Location from "expo-location";
+
+import {User} from "@/entities/User";
+import StructuretBubble from "@/components/StructureBubble";
+import LikedBubble from "@/components/LikedBubble";
 
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
@@ -26,23 +31,18 @@ Notifications.setNotificationHandler({
   }),
 });
 
-import {User} from "@/entities/User";
-import StructuretBubble from "@/components/StructureBubble";
-import {UserContext, UserProvider} from "@/contexts/UserContext";
-
 export default function RootLayout() {
-  const router = useRouter();
 
+  const router = useRouter();
   const [location, setLocation] = useState(undefined);
-  const [user, setUser] = useState<User | null>(null);
+
+  // @ts-ignore
 
   const colorScheme = useColorScheme();
   const [loaded] = useFonts({
     SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
   });
 
-  // @ts-ignore
-  // const { user, token } = useContext(UserContext);
 
   useEffect(() => {
     const requestPermissions = async () => {
@@ -96,7 +96,11 @@ export default function RootLayout() {
         <UserProvider>
           <CartProvider>
 
-            <StructuretBubble />
+            <View style={styles.containerBubble}>
+              <StructuretBubble />
+              <LikedBubble />
+            </View>
+
 
             <Stack screenOptions={{ headerShown: false }}>
 
@@ -111,3 +115,23 @@ export default function RootLayout() {
     </ThemeProvider>
   );
 }
+
+const styles = StyleSheet.create({
+  containerBubble: {
+
+    borderRadius: 12,
+
+    justifyContent: "space-around",
+    alignItems: "center",
+    flexDirection: "row",
+
+    width: 120,
+
+    zIndex: 1,
+
+    position: "absolute",
+    top: 60,
+    right: 25,
+  },
+})
+

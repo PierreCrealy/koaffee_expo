@@ -1,6 +1,6 @@
 import { Tabs } from 'expo-router';
 import React, {useContext} from 'react';
-import { Platform } from 'react-native';
+import {Platform, View, StyleSheet} from 'react-native';
 
 import { HapticTab } from '@/components/HapticTab';
 import TabBarBackground from '@/components/ui/TabBarBackground';
@@ -19,19 +19,10 @@ export default function TabLayout() {
   return (
       <Tabs
           screenOptions={{
-              tabBarActiveTintColor: Colors[colorScheme ?? 'dark'].tint,
+              tabBarActiveTintColor: Colors.primary.main,
               headerShown: false,
               tabBarButton: HapticTab,
               tabBarBackground: TabBarBackground,
-              tabBarStyle: Platform.select({
-                  ios: {
-                      // Use a transparent background on iOS to show the blur effect
-                      position: 'absolute',
-                  },
-                  default: {
-
-                  },
-              }),
           }}>
 
           <Tabs.Screen
@@ -52,9 +43,24 @@ export default function TabLayout() {
           <Tabs.Screen
               name="cart"
               options={{
-                  title: 'Panier',
-                  tabBarIcon: ({ color }) => <Ionicons name="cart" size={28} color={color} />,
+                  title: '',
+                  tabBarIcon: ({ color }) => (
+                      <View style={[styles.middleTab, { backgroundColor: Colors.primary.main }]}>
+                          <Ionicons name="cart" size={28} color={Colors.neutral[700] } />
+                      </View>
+                  ),
                   tabBarBadge: cartProducts.length > 0 ? cartProducts.length : 0,
+                  tabBarItemStyle: {
+                      marginTop: -20,
+                  },
+              }}
+          />
+
+          <Tabs.Screen
+              name="services"
+              options={{
+                  title: 'Services',
+                  tabBarIcon: ({ color }) => <Ionicons name="albums" size={28} color={color} />,
               }}
           />
 
@@ -69,3 +75,18 @@ export default function TabLayout() {
     </Tabs>
   );
 }
+
+
+const styles = StyleSheet.create({
+    middleTab: {
+        width: 55,
+        height: 55,
+        borderRadius: 30,
+        backgroundColor: Colors.primary.main,
+        justifyContent: 'center',
+        alignItems: 'center',
+
+        borderColor: Colors.neutral[700],
+        borderWidth: 3,
+    },
+});

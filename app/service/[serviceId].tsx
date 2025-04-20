@@ -12,28 +12,28 @@ import {ThemedView} from '@/components/ThemedView';
 
 import {useFocusEffect, useLocalSearchParams} from "expo-router";
 import { useNavigation } from "expo-router";
-import React, {useContext, useEffect, useCallback} from "react";
+import React, {useCallback, useEffect, useState, useContext} from "react";
 
-import { Product } from "@/entities/Product";
 import { FormatDate } from "@/usefuls/FormatDate";
+import {Service} from "@/entities/Service";
 
 import { UserContext } from "@/contexts/UserContext";
 
-export default function ProductScreen() {
-    const {productId} = useLocalSearchParams();
+export default function ServiceScreen() {
+    const {serviceId} = useLocalSearchParams();
     const navigation = useNavigation();
 
-    const [product, setProduct] = React.useState<Product>();
-    const [loading, setLoading] = React.useState(false);
+    const [service, setService] = React.useState<Service>();
+    const [loading, setLoading] = useState(false);
 
     // @ts-ignore
     const { user, token } = useContext(UserContext);
 
     useFocusEffect(
         useCallback(() => {
-            const fetchProduct = async () => {
+            const fetchService = async () => {
                 setLoading(true);
-                await fetch(`https://koaffee-api.pierre-dev-app.fr/api/v1/product/${productId}`, {
+                await fetch(`https://koaffee-api.pierre-dev-app.fr/api/v1/service/${serviceId}`, {
                     method: 'GET',
                     headers: {
                         'Content-Type': 'application/json',
@@ -43,17 +43,17 @@ export default function ProductScreen() {
                     .then((response) => response.json())
                     .then(data => {
                         setLoading(false);
-                        setProduct(data.product);
+                        setService(data.service);
                     })
                     .catch((e) => console.log('error : ' + e.message));
             }
 
-            fetchProduct();
+            fetchService();
         }, [user?.id])
     );
 
     useEffect(() => {
-        navigation.setOptions({ headerShown: true, title: 'Produit' });
+        navigation.setOptions({ headerShown: true, title: 'Service' });
     }, [navigation]);
 
     return (
@@ -66,26 +66,21 @@ export default function ProductScreen() {
                 />
             }>
 
-            { loading ? (
+            {loading ? (
                 <ActivityIndicator size="large" color="#B3D8DE" />
             ) : (
                 <View>
                     <ThemedView style={styles.titleContainer}>
-                        <ThemedText type="title">{ product?.name }</ThemedText>
-                        <Text style={styles.dateText}>{FormatDate(product?.created_at)}</Text>
-                        {product?.updated_at !== product?.created_at && (
-                            <Text style={styles.dateText}>{FormatDate(product?.updated_at)}</Text>
+                        <ThemedText type="title">{ service?.name }</ThemedText>
+                        <Text style={styles.dateText}>{FormatDate(service?.created_at)}</Text>
+                        {service?.updated_at !== service?.created_at && (
+                            <Text style={styles.dateText}>{FormatDate(service?.updated_at)}</Text>
                         )}
                     </ThemedView>
 
                     <View style={styles.details}>
-                        {Boolean(product?.fidelity_program) && (
-                            <View style={styles.badge}>
-                                <Text style={styles.badgeText}>Loyalty Program</Text>
-                            </View>
-                        )}
 
-                        {Boolean(product?.proposed) && (
+                        {Boolean(service?.proposed) && (
                             <View style={[styles.badge, styles.proposedBadge]}>
                                 <Text style={styles.badgeText}>Available</Text>
                             </View>
@@ -93,11 +88,11 @@ export default function ProductScreen() {
                     </View>
 
                     <ThemedView>
-                        <Text style={styles.category}>{product?.category}</Text>
-                        <Text style={styles.description}>{product?.description}</Text>
+                        <Text style={styles.description}>{service?.description}</Text>
                     </ThemedView>
                 </View>
             )}
+
 
             <Image
                 source={require('@/assets/images/produt_icon.jpg')}

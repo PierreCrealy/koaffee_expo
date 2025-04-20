@@ -1,26 +1,31 @@
-import {ActivityIndicator, Button, Image, StyleSheet, View,} from 'react-native';
+import {ActivityIndicator, Animated, Button, Image, StyleSheet, View,} from 'react-native';
 import React, {useCallback, useContext, useEffect} from "react";
 
-import {HelloWave} from '@/components/HelloWave';
+import { HelloWave } from '@/components/HelloWave';
 import ParallaxScrollView from '@/components/ParallaxScrollView';
-import {ThemedText} from '@/components/ThemedText';
-import {ThemedView} from '@/components/ThemedView';
+import { ThemedText } from '@/components/ThemedText';
+import { ThemedView } from '@/components/ThemedView';
 import CategorySection from "@/components/CategorySection";
 
 import {Order} from "@/entities/Order";
 
-import {Categories} from "@/constants/Categories";
+import { Categories } from "@/constants/Categories";
 
 import * as SecureStore from "expo-secure-store";
 
 import Ionicons from "@expo/vector-icons/Ionicons";
 import OrderProgress from "@/components/OrderProgress";
-import {useFocusEffect, useRouter} from "expo-router";
-import {UserContext} from "@/contexts/UserContext";
+import { useFocusEffect, useRouter } from "expo-router";
+import { UserContext } from "@/contexts/UserContext";
+
+import * as Notifications from "expo-notifications";
+import * as Device from 'expo-device';
+import { Platform } from 'react-native';
+import {FadeInRight} from "react-native-reanimated";
+
 
 export default function HomeScreen() {
 
-    const [categories, setCategories] = React.useState<string[]>([]);
     const [location, setLocation] = React.useState();
     const [order, setOrder] = React.useState<Order>();
 
@@ -50,7 +55,7 @@ export default function HomeScreen() {
             const latestProgressUserOrder = async () => {
                 setLoading(true);
 
-                await fetch(`https://pass-api.pierre-dev-app.fr/api/v1/order/${user?.id}/PROGRESS/latest`, {
+                await fetch(`https://koaffee-api.pierre-dev-app.fr/api/v1/order/${user?.id}/PROGRESS/latest`, {
                     method: 'GET',
                     headers: {
                         'Content-Type': 'application/json',
@@ -65,10 +70,52 @@ export default function HomeScreen() {
                     .catch((e) => console.log('error : ' + e.message));
             };
 
+            const getExpoToken = async () => {
+                let token;
+
+                console.log("Is device ?")
+                if (Device.isDevice) {
+                    console.log("Is device !")
+                    const { status: existingStatus } = await Notifications.getPermissionsAsync();
+                    let finalStatus = existingStatus;
+
+                    if (existingStatus !== 'granted') {
+                        const { status } = await Notifications.requestPermissionsAsync();
+                        finalStatus = status;
+                    }
+
+                    if (finalStatus !== 'granted') {
+                        alert('Permission pour les notifications refusée 😢');
+                        return;
+                    }
+
+                    const { data } = await Notifications.getExpoPushTokenAsync({
+                        projectId: '3c189bf3-db8a-4168-a8ba-6f523cd1fbfb',
+                    });
+                    token = data;
+                    console.log('Expo Push Token:', token);
+                } else {
+                    console.log("Is not a device !")
+                    alert('Doit être exécuté sur un vrai appareil, pas un simulateur/emulateur');
+                }
+
+                console.log("Platfom ?")
+                if (Platform.OS === 'android') {
+                    console.log("Android !")
+                    Notifications.setNotificationChannelAsync('default', {
+                        name: 'default',
+                        importance: Notifications.AndroidImportance.MAX,
+                        vibrationPattern: [0, 250, 250, 250],
+                        lightColor: '#FF231F7C',
+                    });
+                }
+            };
+
+
+            // getExpoToken();
+
             loadLocation();
             latestProgressUserOrder();
-
-            setCategories(Categories);
 
             return () => {
                 // cleanup (opt)
@@ -79,10 +126,10 @@ export default function HomeScreen() {
 
     return (
         <ParallaxScrollView
-            headerBackgroundColor={{light: '#A1CEDC', dark: '#1D3D47'}}
+            headerBackgroundColor={{light: '#D0D0D0', dark: '#333333'}}
             headerImage={
                 <Image
-                    source={require('@/assets/images/bar.png')}
+                    source={require('@/assets/images/koaffee_logo.png')}
                     style={styles.reactLogo}
                 />
             }>
@@ -103,11 +150,10 @@ export default function HomeScreen() {
 
             <ThemedView style={styles.sectionContainer}>
                 <ThemedText type="title">Catégories</ThemedText>
-                <Ionicons name="filter" size={28} color="black" />
             </ThemedView>
 
             <ThemedView style={styles.stepContainer}>
-                <CategorySection categories={categories} />
+                <CategorySection categories={Categories} />
             </ThemedView>
 
 

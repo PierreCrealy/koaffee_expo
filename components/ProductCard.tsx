@@ -2,11 +2,17 @@ import { StyleSheet, View, Text, TouchableOpacity, Image} from "react-native"
 import { Product } from "@/entities/Product";
 import { Link, useRouter } from "expo-router";
 import { FormatDate } from "@/usefuls/FormatDate";
-import React from "react";
+import React, {useContext} from "react";
+import { Colors } from "@/constants/Colors";
+import Ionicons from "@expo/vector-icons/Ionicons";
+import { CartContext } from "@/contexts/CartContext";
 
 export default function ProductCard ({ product }: {product: Product}) {
 
     const router = useRouter();
+
+    // @ts-ignore
+    const { addToCart } = useContext(CartContext);
 
     const showProducts = () => {
         router.navigate('/product/[productId]')
@@ -17,13 +23,13 @@ export default function ProductCard ({ product }: {product: Product}) {
         <TouchableOpacity style={styles.card} onPress={() => showProducts()}>
             {Boolean(product.highlight) && (
                 <View style={styles.highlightBadge}>
-                    <Text style={styles.highlightText}>Featured</Text>
+                    <Text style={styles.highlightText}>En avant</Text>
                 </View>
             )}
 
             <View style={styles.productCard}>
                 <Image
-                    source={require('@/assets/images/meal_2.png')}
+                    source={require('@/assets/images/produt_icon.jpg')}
                     style={styles.productImage}
                 />
 
@@ -37,11 +43,13 @@ export default function ProductCard ({ product }: {product: Product}) {
                     <View style={styles.details}>
                         {Boolean(product.fidelity_program) && (
                             <View style={styles.badge}>
-                                <Text style={styles.badgeText}>Loyalty Program</Text>
+                                <Text style={styles.badgeText}>Programme de fidélité</Text>
                             </View>
                         )}
 
                     </View>
+
+                    <Text style={styles.price}>{product.price} €</Text>
                 </View>
             </View>
 
@@ -51,13 +59,53 @@ export default function ProductCard ({ product }: {product: Product}) {
                 {product.updated_at !== product.created_at && (
                     <Text style={styles.dateText}>{FormatDate(product.updated_at)}</Text>
                 )}
-                <Text style={styles.price}>{product.price} €</Text>
+
+                <TouchableOpacity style={styles.addButton} onPress={() => addToCart(product)}>
+                    <Ionicons name="add" size={18} color={Colors.neutral[700]} />
+                </TouchableOpacity>
+                <TouchableOpacity>
+                    <Ionicons name="heart" size={32} color="#F04729" />
+                </TouchableOpacity>
             </View>
         </TouchableOpacity>
     )
 }
 
 const styles = StyleSheet.create({
+    image: {
+        width: '100%',
+        height: 120,
+        resizeMode: 'cover',
+    },
+    content: {
+        padding: 12,
+    },
+    horizontalContent: {
+        flex: 1,
+        padding: 12,
+    },
+
+    description: {
+        fontSize: 14,
+        color: Colors.neutral[500],
+        marginBottom: 8,
+    },
+
+    horizontalFooter: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginTop: 'auto',
+    },
+
+    addButton: {
+        width: 80,
+        height: 32,
+        borderRadius: 12,
+        backgroundColor: Colors.primary.light,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
     productCard: {
         flexDirection: "row",
         justifyContent: "space-around",
@@ -90,14 +138,14 @@ const styles = StyleSheet.create({
         position: "absolute",
         top: 0,
         right: 0,
-        backgroundColor: "#f4511e",
+        backgroundColor: Colors.primary.light,
         paddingHorizontal: 8,
         paddingVertical: 4,
         borderTopRightRadius: 12,
         borderBottomLeftRadius: 8,
     },
     highlightText: {
-        color: "white",
+        color: Colors.neutral[700],
         fontSize: 12,
         fontWeight: "bold",
     },
@@ -150,7 +198,7 @@ const styles = StyleSheet.create({
     price: {
         fontSize: 18,
         fontWeight: "bold",
-        color: "#f4511e",
+        color: Colors.neutral[700],
     },
     dateText: {
         fontSize: 12,

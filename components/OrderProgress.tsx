@@ -1,9 +1,8 @@
-"use client"
-
 import { StyleSheet, View, Text, TouchableOpacity } from "react-native"
 import { Ionicons } from "@expo/vector-icons"
 
 import { Order } from "@/entities/Order";
+import { Colors } from "@/constants/Colors";
 import { FormatDate } from "@/usefuls/FormatDate";
 
 import * as Progress from "react-native-progress";
@@ -26,7 +25,7 @@ const OrderProgress = ({ order }: {order: any}) => {
           <View style={styles.header}>
             <View style={styles.containerRow}>
               <Text style={styles.title}>Commande en préparation</Text>
-              <Ionicons name="newspaper" size={28} color="black" />
+              <Ionicons name="newspaper" size={28} color={Colors.neutral[700]} />
             </View>
             <Text style={styles.orderNumber}>Commande #{order.id}</Text>
           </View>
@@ -43,7 +42,7 @@ const OrderProgress = ({ order }: {order: any}) => {
           </View>
 
           <View style={styles.progressRow}>
-            <Progress.Bar progress={0.3} width={200} animated={true} color="#f4511e" />
+            <Progress.Bar progress={0.3} width={200} animated={true} color={Colors.primary.light} />
           </View>
 
         </View>
@@ -90,11 +89,11 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 18,
     fontWeight: "bold",
-    color: "#f4511e",
+    color: Colors.primary.light,
   },
   orderNumber: {
     fontSize: 14,
-    color: "#666",
+    color: Colors.neutral[700],
     marginTop: 2,
   },
   infoItem: {
@@ -102,12 +101,12 @@ const styles = StyleSheet.create({
   },
   infoLabel: {
     fontSize: 12,
-    color: "#888",
+    color: Colors.neutral[500],
     marginBottom: 4,
   },
   infoValue: {
     fontSize: 14,
     fontWeight: "500",
-    color: "#333",
+    color: Colors.neutral[700],
   },
 })

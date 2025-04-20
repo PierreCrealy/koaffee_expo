@@ -2,9 +2,10 @@
   "expo": {
     "name": "Koaffee",
     "slug": "Koaffee",
+    "owner" : "bourna13pi",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/pass_logo.png",
+    "icon": "./assets/images/koaffee_logo.png",
     "scheme": "myapp",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
@@ -16,7 +17,10 @@
         "foregroundImage": "./assets/images/pass_logo.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.anonymous.PassExpo"
+      "package": "com.anonymous.PassExpo",
+      "permissions": [
+        "NOTIFICATIONS"
+      ]
     },
     "web": {
       "bundler": "metro",
@@ -45,6 +49,11 @@
     ],
     "experiments": {
       "typedRoutes": true
+    },
+    "extra": {
+      "expoClient": {
+        "projectId": "3c189bf3-db8a-4168-a8ba-6f523cd1fbfb"
+      }
     }
   }
 }
