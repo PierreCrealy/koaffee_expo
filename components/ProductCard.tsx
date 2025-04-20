@@ -1,6 +1,6 @@
 import { StyleSheet, View, Text, TouchableOpacity, Image} from "react-native"
 import { Product } from "@/entities/Product";
-import { Link, useRouter } from "expo-router";
+import { useRouter } from "expo-router";
 import { FormatDate } from "@/usefuls/FormatDate";
 import React, {useContext} from "react";
 import { Colors } from "@/constants/Colors";

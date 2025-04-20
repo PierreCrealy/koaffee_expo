@@ -1,6 +1,5 @@
-import {StyleSheet, View, Text, FlatList, TouchableOpacity, Image, Animated} from "react-native"
+import {StyleSheet, View, Text, TouchableOpacity, Image, Animated} from "react-native"
 
-import CartItem from "./CartItem"
 import React from "react";
 import { useRouter} from "expo-router";
 import ScrollView = Animated.ScrollView;

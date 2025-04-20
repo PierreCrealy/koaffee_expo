@@ -1,5 +1,4 @@
 import { StyleSheet, View, Text, FlatList, TouchableOpacity } from "react-native"
-//import { useCart } from "../context/CartContext"
 import CartItem from "./CartItem"
 import { Product } from "@/entities/Product";
 import {useContext} from "react";

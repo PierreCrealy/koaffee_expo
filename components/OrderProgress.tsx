@@ -1,7 +1,6 @@
 import { StyleSheet, View, Text, TouchableOpacity } from "react-native"
 import { Ionicons } from "@expo/vector-icons"
 
-import { Order } from "@/entities/Order";
 import { Colors } from "@/constants/Colors";
 import { FormatDate } from "@/usefuls/FormatDate";
 

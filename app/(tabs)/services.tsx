@@ -2,36 +2,38 @@ import {
     StyleSheet,
     Image,
     View,
-    TouchableOpacity,
     Text,
-    SectionList,
     ActivityIndicator, FlatList,
+    Animated,
 } from 'react-native';
 
 import ParallaxScrollView from '@/components/ParallaxScrollView';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
-import ProductCard from "@/components/ProductCard";
 
 import React, {useCallback, useContext, useEffect, useState} from "react";
 
 import { Service } from "@/entities/Service";
 
-import { CartContext } from "@/contexts/CartContext";
+import { UserContext } from "@/contexts/UserContext";
 import {useFocusEffect} from "expo-router";
-import { User } from "@/entities/User";
-import * as SecureStore from "expo-secure-store";
 import ServiceCard from "@/components/ServiceCard";
+
+import { slideInFromLeft } from "@/animations/Animations";
 
 export default function ServicesScreen() {
 
     const [services, setServices] = useState<Service[]>([]);
-    const [user, setUser] = React.useState<User>();
-    const [token, setToken] = React.useState<string>();
     const [loading, setLoading] = React.useState(false);
 
+    const { translateX, animation: slideLeftAnim } = slideInFromLeft();
+
     // @ts-ignore
-    const { addToCart, cartProducts } = useContext(CartContext);
+    const { user, token } = useContext(UserContext);
+
+    useEffect(() => {
+        Animated.parallel([slideLeftAnim]).start();
+    }, []);
 
     const fetchServices = async () => {
         setLoading(true);
@@ -50,20 +52,10 @@ export default function ServicesScreen() {
             })
             .catch((e) => console.log('error : ' + e.message));
     }
-    const loadUser = async () => {
-        const tokenSec = await SecureStore.getItemAsync('userToken');
-        const userInfo = await SecureStore.getItemAsync('userInfo');
-        const userSec = JSON.parse((userInfo) as string);
-
-        setUser(userSec);
-        setToken((tokenSec) as string);
-    }
-
 
     useFocusEffect(
         useCallback(() => {
             fetchServices();
-            loadUser();
 
         }, [user?.id])
     );
@@ -94,10 +86,15 @@ export default function ServicesScreen() {
                         keyExtractor={(item) => item.id.toString()}
                         renderItem={({ item }) =>
                             (
-                                <View style={styles.itemProduct}>
-                                    <ServiceCard service={item} />
-                                </View>
-
+                                <Animated.View style={[
+                                    {
+                                        transform: [{ translateX }],
+                                    }
+                                ]}>
+                                    <View style={styles.itemProduct}>
+                                        <ServiceCard service={item} />
+                                    </View>
+                                </Animated.View>
                             )}
                         //contentContainerStyle={styles.list}
                         ListEmptyComponent={<Text style={styles.emptyText}>Aucun service disponible</Text>}

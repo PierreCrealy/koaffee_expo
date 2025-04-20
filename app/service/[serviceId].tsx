@@ -29,26 +29,28 @@ export default function ServiceScreen() {
     // @ts-ignore
     const { user, token } = useContext(UserContext);
 
+    const fetchService = async () => {
+        setLoading(true);
+        await fetch(`https://koaffee-api.pierre-dev-app.fr/api/v1/service/${serviceId}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`,
+            },
+        })
+            .then((response) => response.json())
+            .then(data => {
+                setLoading(false);
+                setService(data.service);
+            })
+            .catch((e) => console.log('error : ' + e.message));
+    }
+
     useFocusEffect(
         useCallback(() => {
-            const fetchService = async () => {
-                setLoading(true);
-                await fetch(`https://koaffee-api.pierre-dev-app.fr/api/v1/service/${serviceId}`, {
-                    method: 'GET',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}`,
-                    },
-                })
-                    .then((response) => response.json())
-                    .then(data => {
-                        setLoading(false);
-                        setService(data.service);
-                    })
-                    .catch((e) => console.log('error : ' + e.message));
-            }
 
             fetchService();
+
         }, [user?.id])
     );
 

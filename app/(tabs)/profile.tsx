@@ -1,68 +1,56 @@
 import {StyleSheet, Image, Text, TouchableOpacity, View, SectionList, ActivityIndicator} from 'react-native';
 
-import { Collapsible } from '@/components/Collapsible';
-import { ExternalLink } from '@/components/ExternalLink';
 import ParallaxScrollView from '@/components/ParallaxScrollView';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
+import { Collapsible } from '@/components/Collapsible';
 
-import React, {useCallback, useContext, useEffect, useState} from "react";
+import React, {useCallback, useContext, useState} from "react";
 
 import * as SecureStore from "expo-secure-store";
 import {useFocusEffect, useRouter} from "expo-router";
-import { User } from "@/entities/User";
 import Ionicons from "@expo/vector-icons/Ionicons";
 
 import { Order } from "@/entities/Order";
 import OrderCard from "@/components/OrderCard";
-import {CartContext} from "@/contexts/CartContext";
-import {UserContext} from "@/contexts/UserContext";
+import { CartContext } from "@/contexts/CartContext";
+import { UserContext } from "@/contexts/UserContext";
 
 import { Colors } from "@/constants/Colors";
 
 export default function ProfileScreen() {
 
+    const router = useRouter();
+
     // @ts-ignore
     const { cleanCart } = useContext(CartContext);
 
     // @ts-ignore
-    const { disconnectUser } = useContext(UserContext);
+    const { user, token, disconnectUser } = useContext(UserContext);
 
-
-    const router = useRouter();
-    const [user, setUser] = useState<User>();
     const [orders, setOrders] = useState<Order[]>([]);
-    const [token, setToken] = useState<string>();
     const [loading, setLoading] = useState(false);
+
+    const fetchOrders = async () => {
+        setLoading(true);
+        await fetch(`https://koaffee-api.pierre-dev-app.fr/api/v1/order/${user?.id}/group-by-status`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`,
+            },
+        })
+            .then((response) => response.json())
+            .then(data => {
+                setOrders(data.orders);
+                setLoading(false);
+            })
+            .catch((e) => console.log('error : ' + e.message));
+    }
 
     useFocusEffect(
         useCallback(() => {
-            const loadUser = async () => {
-                const tokenSec = await SecureStore.getItemAsync('userToken');
-                const userInfo = await SecureStore.getItemAsync('userInfo');
-                const userStore = JSON.parse((userInfo) as string);
 
-                setUser(userStore);
-                setToken((tokenSec) as string);
-            }
-            const fetchOrders = async () => {
-                setLoading(true);
-                await fetch(`https://koaffee-api.pierre-dev-app.fr/api/v1/order/${user?.id}/group-by-status`, {
-                    method: 'GET',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}`,
-                    },
-                })
-                    .then((response) => response.json())
-                    .then(data => {
-                        setOrders(data.orders);
-                        setLoading(false);
-                    })
-                    .catch((e) => console.log('error : ' + e.message));
-            }
-
-            loadUser();
             fetchOrders();
 
         }, [user?.id])
@@ -89,7 +77,7 @@ export default function ProfileScreen() {
             headerBackgroundColor={{ light: '#FFFFFF', dark: '#353636' }}
             headerImage={
                 <Image
-                    source={require('@/assets/images/coffee.png')}
+                    source={require('@/assets/images/koaffee_logo.png')}
                     style={styles.reactLogo}
                 />
             }
@@ -97,17 +85,20 @@ export default function ProfileScreen() {
 
             <ThemedView style={styles.titleContainer}>
                 <ThemedText type="title">Profil</ThemedText>
+
+                <TouchableOpacity style={styles.disconnectBtn}  onPress={() => attemptDisconnect()} >
+                    <Text style={styles.textBtn}>Déconnexion</Text><Ionicons name="log-out" size={32} color={Colors.neutral[700]} />
+                </TouchableOpacity>
             </ThemedView>
 
             <ThemedView style={styles.stepContainer}>
                 <ThemedText type="default">Nom   : {user?.name}</ThemedText>
                 <ThemedText type="default">Email : {user?.email}</ThemedText>
+                <View style={styles.badge}>
+                    <Text style={styles.textBadge}>{user?.fidelityPts}</Text><Ionicons name="server-sharp" size={32} color="white" />
+                </View>
             </ThemedView>
 
-
-            <TouchableOpacity style={styles.disconnectBtn}  onPress={() => attemptDisconnect()} >
-                <Text style={styles.textBtn}>Se déconnecter</Text><Ionicons name="log-out" size={32} color={Colors.neutral[700]} />
-            </TouchableOpacity>
 
             <Collapsible title="Commandes">
 
@@ -141,6 +132,36 @@ export default function ProfileScreen() {
 }
 
 const styles = StyleSheet.create({
+    badge: {
+        width: '35%',
+
+        backgroundColor: Colors.success.light,
+        borderRadius: 8,
+
+        paddingVertical: 8,
+        paddingHorizontal: 25,
+
+        elevation: 3,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.8,
+        shadowRadius: 2,
+
+        marginTop: 10,
+
+        flexDirection: 'row',
+
+        alignItems: 'center',
+        alignSelf: 'flex-start',
+        justifyContent: 'space-between',
+
+    },
+    textBadge: {
+        fontSize: 18,
+        textAlign: 'center',
+        fontWeight: 'bold',
+        color: 'white',
+    },
     header: {
         marginTop: 60,
         marginBottom: 35,
@@ -161,8 +182,6 @@ const styles = StyleSheet.create({
         color: Colors.neutral[700],
     },
     disconnectBtn: {
-        width: '80%',
-
         backgroundColor: Colors.primary.light,
         borderRadius: 8,
 
@@ -174,8 +193,6 @@ const styles = StyleSheet.create({
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.8,
         shadowRadius: 2,
-
-        marginTop: 10,
 
         flexDirection: 'row',
 
@@ -190,7 +207,11 @@ const styles = StyleSheet.create({
     },
     titleContainer: {
         flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
         gap: 8,
+
+        marginBottom: 20,
     },
     stepContainer: {
         gap: 8,

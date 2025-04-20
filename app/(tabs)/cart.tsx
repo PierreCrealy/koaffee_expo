@@ -19,42 +19,37 @@ import { Product } from "@/entities/Product";
 import { User } from "@/entities/User";
 
 import { CartContext } from "@/contexts/CartContext";
+import { UserContext } from "@/contexts/UserContext";
+
 import Ionicons from "@expo/vector-icons/Ionicons";
 
 import { CountriesBonus } from "@/constants/CountriesBonus";
-import SendNotification from "@/usefuls/SendNotification";
 import {Colors} from "@/constants/Colors";
 
+import SendNotification from "@/usefuls/SendNotification";
 
 
 export default function CartScreen() {
 
     const router = useRouter();
 
+    const [location, setLocation] = React.useState();
+
     // @ts-ignore
     const { cleanCart, cartProducts } = useContext(CartContext);
-    const [user, setUser] = React.useState<User>();
-    const [location, setLocation] = React.useState();
-    const [token, setToken] = React.useState<string>();
+
+    // @ts-ignore
+    const { user, token } = useContext(UserContext);
+
+    const loadLocation = async () => {
+        const locationSec = await SecureStore.getItemAsync('location');
+        // @ts-ignore
+        setLocation(locationSec)
+    }
 
     useFocusEffect(
         useCallback(() => {
-            const loadUser = async () => {
-                const tokenSec = await SecureStore.getItemAsync('userToken');
-                const userInfo = await SecureStore.getItemAsync('userInfo');
-                const userSec = JSON.parse((userInfo) as string);
-
-                setUser(userSec);
-                setToken((tokenSec) as string);
-            }
-            const loadLocation = async () => {
-                const locationSec = await SecureStore.getItemAsync('location');
-                // @ts-ignore
-                setLocation(locationSec)
-            }
-
             loadLocation()
-            loadUser();
 
         }, [user?.id])
     );

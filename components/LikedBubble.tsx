@@ -1,12 +1,9 @@
-import {StyleSheet, View, Text, FlatList, TouchableOpacity, ActivityIndicator, SectionList} from "react-native"
+import {StyleSheet, View, TouchableOpacity} from "react-native"
 import React, {useContext} from "react";
 
 import Ionicons from '@expo/vector-icons/Ionicons';
 import {useRouter} from "expo-router";
 import {UserContext} from "@/contexts/UserContext";
-
-import { Colors } from "@/constants/Colors";
-
 
 const LikedBubble = () => {
 

@@ -1,13 +1,8 @@
-import { StyleSheet, View, Text, TouchableOpacity } from "react-native"
+import { StyleSheet, View, Text } from "react-native"
 import {Product} from "@/entities/Product";
-import {useContext} from "react";
-import {CartContext} from "@/contexts/CartContext";
 import {Colors} from "@/constants/Colors";
 
 const CartItem = ({ product }: {product: Product}) => {
-
-  // @ts-ignore
-  const { removeFromCart } = useContext(CartContext);
 
   return (
     <View style={styles.container}>

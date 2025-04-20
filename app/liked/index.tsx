@@ -1,4 +1,5 @@
 import {
+    ActivityIndicator,
     FlatList,
     Image,
     StyleSheet,
@@ -32,27 +33,28 @@ export default function LikedIndexScreen() {
     // @ts-ignore
     const { user, token } = useContext(UserContext);
 
+    const fetchService = async () => {
+        setLoading(true);
+        await fetch(`https://koaffee-api.pierre-dev-app.fr/api/v1/liked-product/${user.id}/liked`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`,
+            },
+        })
+            .then((response) => response.json())
+            .then(data => {
+                setLoading(false);
+                setLikedProducts(data.likedProducts);
+            })
+            .catch((e) => console.log('error : ' + e.message));
+    }
 
     useFocusEffect(
         useCallback(() => {
-            const fetchService = async () => {
-                setLoading(true);
-                await fetch(`https://koaffee-api.pierre-dev-app.fr/api/v1/liked-product/${user.id}/liked`, {
-                    method: 'GET',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}`,
-                    },
-                })
-                    .then((response) => response.json())
-                    .then(data => {
-                        setLoading(false);
-                        setLikedProducts(data.likedProducts);
-                    })
-                    .catch((e) => console.log('error : ' + e.message));
-            }
 
             fetchService();
+
         }, [user?.id])
     );
 
@@ -66,32 +68,37 @@ export default function LikedIndexScreen() {
             headerBackgroundColor={{light: '#A1CEDC', dark: '#1D3D47'}}
             headerImage={
                 <Image
-                    source={require('@/assets/images/meal.png')}
+                    source={require('@/assets/images/produt_icon.jpg')}
                     style={styles.reactLogo}
                 />
             }>
 
-            <ThemedView>
-                <FlatList
-                    scrollEnabled={false}
-                    data={likedProducts}
-                    keyExtractor={(item) => item.id.toString()}
-                    renderItem={({ item }) =>
-                        (
-                            <View style={styles.itemProduct}>
-                                <ProductCard product={item} />
-                                <View style={styles.actionItemProduct}>
-                                    <TouchableOpacity style={styles.addBtn} onPress={() => addToCart(item)}>
-                                        <Text style={styles.textBtn}>Ajouter +</Text>
-                                    </TouchableOpacity>
+            { loading ? (
+                <ActivityIndicator size="large" color="#B3D8DE" />
+            ) : (
+                <ThemedView>
+                    <FlatList
+                        scrollEnabled={false}
+                        data={likedProducts}
+                        keyExtractor={(item) => item.id.toString()}
+                        renderItem={({ item }) =>
+                            (
+                                <View style={styles.itemProduct}>
+                                    <ProductCard product={item} />
+                                    <View style={styles.actionItemProduct}>
+                                        <TouchableOpacity style={styles.addBtn} onPress={() => addToCart(item)}>
+                                            <Text style={styles.textBtn}>Ajouter +</Text>
+                                        </TouchableOpacity>
+                                    </View>
                                 </View>
-                            </View>
 
-                        )}
-                    contentContainerStyle={styles.list}
-                    ListEmptyComponent={<Text style={styles.emptyText}>Aucun produit disponible</Text>}
-                />
-            </ThemedView>
+                            )}
+                        contentContainerStyle={styles.list}
+                        ListEmptyComponent={<Text style={styles.emptyText}>Aucun produit disponible</Text>}
+                    />
+                </ThemedView>
+            )}
+
 
         </ParallaxScrollView>
     );

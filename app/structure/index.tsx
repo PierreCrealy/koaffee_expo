@@ -1,4 +1,4 @@
-import {StyleSheet, Image, Text, TouchableOpacity, View, SectionList} from 'react-native';
+import {StyleSheet, Image, View} from 'react-native';
 
 import ParallaxScrollView from '@/components/ParallaxScrollView';
 import { ThemedText } from '@/components/ThemedText';
@@ -26,7 +26,7 @@ export default function StructureScreen() {
             headerBackgroundColor={{ light: '#D0D0D0', dark: '#353636' }}
             headerImage={
                 <Image
-                    source={require('@/assets/images/coffee.png')}
+                    source={require('@/assets/images/koaffee_logo.png')}
                     style={styles.reactLogo}
                 />
             }
@@ -68,7 +68,7 @@ const styles = StyleSheet.create({
     },
     map: {
         width: '100%',
-        height: 500,
+        height: 480,
     },
     header: {
         marginTop: 60,
@@ -81,6 +81,7 @@ const styles = StyleSheet.create({
     titleContainer: {
         flexDirection: 'row',
         gap: 8,
+        marginBottom: 20,
     },
 
 });

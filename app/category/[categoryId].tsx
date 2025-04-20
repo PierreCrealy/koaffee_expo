@@ -1,23 +1,19 @@
 import {
-    ActivityIndicator, Animated,
-    FlatList,
+    ActivityIndicator,
+    Animated,
     Image,
     StyleSheet,
-    Text, TouchableOpacity,
-    View,
 } from 'react-native';
 import React, {useCallback, useContext, useEffect, useState} from "react";
 
 import ParallaxScrollView from '@/components/ParallaxScrollView';
 import {ThemedView} from '@/components/ThemedView';
-import ProductCard from '@/components/ProductCard';
 
 import {useFocusEffect, useLocalSearchParams} from "expo-router";
 import { useNavigation } from "expo-router";
 
 import { Product } from "@/entities/Product";
 
-import {CartContext} from "@/contexts/CartContext";
 import {UserContext} from "@/contexts/UserContext";
 import ScrollView = Animated.ScrollView;
 import ProductHorizontalCard from "@/components/ProductHorizontalCard";
@@ -30,31 +26,30 @@ export default function ProductsCategoryScreen() {
     const [products, setProducts] = React.useState<Product[]>([]);
 
     // @ts-ignore
-    const { addToCart } = useContext(CartContext);
-
-    // @ts-ignore
     const { user, token } = useContext(UserContext);
+
+    const fetchProducts = async () => {
+        setLoading(true);
+        await fetch(`https://koaffee-api.pierre-dev-app.fr/api/v1/product/${categoryId}/products-category`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`,
+            },
+        })
+            .then((response) => response.json())
+            .then(data => {
+                setLoading(false);
+                setProducts(data.products);
+            })
+            .catch((e) => console.log('error : ' + e.message));
+    }
 
     useFocusEffect(
         useCallback(() => {
-            const fetchProducts = async () => {
-                setLoading(true);
-                await fetch(`https://koaffee-api.pierre-dev-app.fr/api/v1/product/${categoryId}/products-category`, {
-                    method: 'GET',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}`,
-                    },
-                })
-                    .then((response) => response.json())
-                    .then(data => {
-                        setLoading(false);
-                        setProducts(data.products);
-                    })
-                    .catch((e) => console.log('error : ' + e.message));
-            }
 
             fetchProducts();
+
         }, [user?.id])
     );
 

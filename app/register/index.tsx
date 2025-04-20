@@ -7,7 +7,7 @@ import { ThemedView } from '@/components/ThemedView';
 import React, {useContext} from "react";
 
 import * as SecureStore from "expo-secure-store";
-import { useRouter } from "expo-router";
+import {Link, useRouter} from "expo-router";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import {UserContext} from "@/contexts/UserContext";
 import { User } from '@/entities/User';
@@ -16,32 +16,34 @@ import { Colors } from "@/constants/Colors";
 
 export default function AuthScreen() {
 
+    const router = useRouter();
+
+
+    const [name, setName] = React.useState('');
     const [email, setEmail] = React.useState('');
     const [password, setPassword] = React.useState('');
 
     // @ts-ignore
     const { user, connectUser } = useContext(UserContext);
 
-    const router = useRouter();
-
-    async function attemptConnexion()
+    async function attemptRegister()
     {
         try{
-            // alert(email + " / " + password);
 
-            const ids = {
+            const form = {
+                name : name,
                 email: email,
                 password: password,
             }
 
             const response = await fetch(
-                'https://koaffee-api.pierre-dev-app.fr/api/v1/login',
+                'https://koaffee-api.pierre-dev-app.fr/api/v1/register',
                 {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify(ids)
+                    body: JSON.stringify(form)
                 }
             );
 
@@ -50,6 +52,7 @@ export default function AuthScreen() {
             await SecureStore.setItemAsync('userToken', data.success.token)
             // @ts-ignore
             await SecureStore.setItemAsync('userInfo', JSON.stringify({ id: data.success.id, name: data.success.name, email: data.success.email }))
+
 
             const userC: User = {
                 id: data.success.id,
@@ -60,29 +63,13 @@ export default function AuthScreen() {
 
             connectUser({ user: userC, token: data.success.token})
 
-            // alert("Store token : " + await SecureStore.getItemAsync('token'))
-            // alert('Connexion réussi.')
-
             router.push('/(tabs)')
 
         }catch(e){
-            alert('Connexion échoué.')
+            alert('L\'inscription à échoué : \nVeuillez vérifier vos informations et retenter.')
         }
     }
 
-    const attemptRegister = () => {
-        router.navigate('/register');
-    }
-
-    const setUserOneForm = () => {
-        setEmail('guest@cda.fr');
-        setPassword('cda');
-    }
-
-    const setUserTwoForm = () => {
-        setEmail('guest2@cda.fr');
-        setPassword('cda');
-    }
 
   return (
       <ParallaxScrollView
@@ -94,8 +81,7 @@ export default function AuthScreen() {
             />
           }>
           <ThemedView style={styles.titleContainer}>
-            <ThemedText type="title">Koaffee </ThemedText>
-            <HelloWave />
+            <ThemedText type="title">Koaffee Inscription</ThemedText>
           </ThemedView>
 
           <ThemedView style={styles.formContainer}>
@@ -103,9 +89,20 @@ export default function AuthScreen() {
               <View style={styles.inputContainer}>
                   <Ionicons name="person" size={32} color={Colors.primary.light} />
                   <TextInput
+                      onChangeText={(text) => setName(text)}
+                      value={name}
+                      placeholder="Votre nom"
+                      placeholderTextColor={Colors.neutral[500]}
+                      style={styles.textInput}
+                  />
+              </View>
+
+              <View style={styles.inputContainer}>
+                  <Ionicons name="mail" size={32} color={Colors.primary.light} />
+                  <TextInput
                       onChangeText={(text) => setEmail(text)}
                       value={email}
-                      placeholder="Votre adresse e-mail"
+                      placeholder="Votre adresse mail"
                       placeholderTextColor={Colors.neutral[500]}
                       style={styles.textInput}
                   />
@@ -123,21 +120,16 @@ export default function AuthScreen() {
                   />
               </View>
 
-              <View style={styles.buttonContainer}>
-                  <TouchableOpacity style={styles.connexionBtn}  onPress={() => attemptConnexion()} >
-                      <Text style={styles.textBtn}>Connexion</Text><Ionicons name="log-in" size={32} color={Colors.neutral[500]} />
-                  </TouchableOpacity>
-
+              <View style={styles.container}>
                   <TouchableOpacity style={styles.registerBtn}  onPress={() => attemptRegister()} >
-                      <Text style={styles.textBtn}>Inscription</Text><Ionicons name="arrow-down" size={32} color={Colors.neutral[500]} />
+                      <Text style={styles.textBtn}>Confirmer l'inscription</Text><Ionicons name="arrow-down" size={32} color={Colors.neutral[500]} />
                   </TouchableOpacity>
               </View>
 
-
-              <View style={styles.buttonContainer}>
-                  <TouchableOpacity style={styles.connexionBtn}  onPress={() => setUserOneForm()} >
-                      <Text style={styles.textBtn}>User 1</Text>
-                  </TouchableOpacity>
+              <View style={styles.container}>
+                  <Link href="/" style={styles.link}>
+                      <ThemedText type="link">Retour à la page de connexion</ThemedText>
+                  </Link>
               </View>
 
           </ThemedView>
@@ -147,6 +139,10 @@ export default function AuthScreen() {
 }
 
 const styles = StyleSheet.create({
+    link: {
+        marginTop: 15,
+        paddingVertical: 15,
+    },
     textInput: {
         fontSize: 18,
         color: Colors.neutral[700],
@@ -162,13 +158,13 @@ const styles = StyleSheet.create({
 
         alignItems: 'center',
     },
-    buttonContainer: {
+    container: {
         flexDirection: 'row',
 
         marginTop: 25,
 
         alignItems: 'center',
-        justifyContent: 'space-between',
+        justifyContent: 'center',
     },
     textBtn: {
         fontSize: 18,

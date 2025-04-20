@@ -2,10 +2,10 @@ import {
     StyleSheet,
     Image,
     View,
-    TouchableOpacity,
     Text,
     SectionList,
-    ActivityIndicator, Animated, FlatList,
+    ActivityIndicator,
+    Animated,
 } from 'react-native';
 
 import ParallaxScrollView from '@/components/ParallaxScrollView';
@@ -17,21 +17,20 @@ import React, {useCallback, useContext, useEffect, useState} from "react";
 
 import { Product } from "@/entities/Product";
 
-import { CartContext } from "@/contexts/CartContext";
+import { UserContext } from "@/contexts/UserContext";
 import {useFocusEffect} from "expo-router";
-import {User} from "@/entities/User";
-import * as SecureStore from "expo-secure-store";
-import ScrollView = Animated.ScrollView;
+
+import { slideInFromLeft } from "@/animations/Animations";
 
 export default function ProductsScreen() {
 
     const [products, setProducts] = useState<Product[]>([]);
-    const [user, setUser] = React.useState<User>();
-    const [token, setToken] = React.useState<string>();
     const [loading, setLoading] = React.useState(false);
 
+    const { translateX, animation: slideLeftAnim } = slideInFromLeft();
+
     // @ts-ignore
-    const { addToCart, cartProducts } = useContext(CartContext);
+    const { user, token } = useContext(UserContext);
 
     const fetchProducts = async () => {
         setLoading(true);
@@ -49,26 +48,19 @@ export default function ProductsScreen() {
             })
             .catch((e) => console.log('error : ' + e.message));
     }
-    const loadUser = async () => {
-        const tokenSec = await SecureStore.getItemAsync('userToken');
-        const userInfo = await SecureStore.getItemAsync('userInfo');
-        const userSec = JSON.parse((userInfo) as string);
-
-        setUser(userSec);
-        setToken((tokenSec) as string);
-    }
-
     const sections = Object.keys(products).map(category => ({
         title: category,
         // @ts-ignore
         data: products[category],
     }));
 
+    useEffect(() => {
+        Animated.parallel([slideLeftAnim]).start();
+    }, []);
 
     useFocusEffect(
         useCallback(() => {
             fetchProducts();
-            loadUser();
 
         }, [user?.id])
     );
@@ -99,9 +91,16 @@ export default function ProductsScreen() {
                         keyExtractor={(item) => item.id.toString()}
                         ListEmptyComponent={<Text style={styles.emptyText}>Aucun produit disponible</Text>}
                         renderItem={({item}) => (
-                            <View style={styles.itemProduct}>
-                                <ProductCard product={item} />
-                            </View>
+                            <Animated.View style={[
+                                {
+                                    transform: [{ translateX }],
+                                }
+                            ]}>
+                                <View style={styles.itemProduct}>
+                                    <ProductCard product={item} />
+                                </View>
+                            </Animated.View>
+
                         )}
                         renderSectionHeader={({section}) => (
                             <ThemedView style={styles.titleContainer}>
@@ -109,16 +108,6 @@ export default function ProductsScreen() {
                             </ThemedView>
                         )}
                     />
-
-                    {/*<ScrollView*/}
-                    {/*    horizontal*/}
-                    {/*    showsHorizontalScrollIndicator={false}*/}
-                    {/*    contentContainerStyle={styles.featuredContainer}*/}
-                    {/*>*/}
-                    {/*    {products.map((product) => (*/}
-                    {/*        <ProductCard key={product.id} product={product} />*/}
-                    {/*    ))}*/}
-                    {/*</ScrollView>*/}
                 </ThemedView>
             )}
 

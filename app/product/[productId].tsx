@@ -29,26 +29,28 @@ export default function ProductScreen() {
     // @ts-ignore
     const { user, token } = useContext(UserContext);
 
+    const fetchProduct = async () => {
+        setLoading(true);
+        await fetch(`https://koaffee-api.pierre-dev-app.fr/api/v1/product/${productId}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`,
+            },
+        })
+            .then((response) => response.json())
+            .then(data => {
+                setLoading(false);
+                setProduct(data.product);
+            })
+            .catch((e) => console.log('error : ' + e.message));
+    }
+
     useFocusEffect(
         useCallback(() => {
-            const fetchProduct = async () => {
-                setLoading(true);
-                await fetch(`https://koaffee-api.pierre-dev-app.fr/api/v1/product/${productId}`, {
-                    method: 'GET',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}`,
-                    },
-                })
-                    .then((response) => response.json())
-                    .then(data => {
-                        setLoading(false);
-                        setProduct(data.product);
-                    })
-                    .catch((e) => console.log('error : ' + e.message));
-            }
 
             fetchProduct();
+
         }, [user?.id])
     );
 

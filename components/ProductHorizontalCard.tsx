@@ -1,7 +1,6 @@
 import { StyleSheet, View, Text, TouchableOpacity, Image} from "react-native"
 import { Product } from "@/entities/Product";
-import { Link, useRouter } from "expo-router";
-import { FormatDate } from "@/usefuls/FormatDate";
+import { useRouter } from "expo-router";
 import React, {useContext} from "react";
 import { Colors } from "@/constants/Colors";
 import Ionicons from "@expo/vector-icons/Ionicons";
