@@ -6,6 +6,7 @@ import React, {useContext} from "react";
 import { Colors } from "@/constants/Colors";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { CartContext } from "@/contexts/CartContext";
+import { LikedContext } from "@/contexts/LikedContext";
 
 export default function ProductCard ({ product }: {product: Product}) {
 
@@ -13,6 +14,9 @@ export default function ProductCard ({ product }: {product: Product}) {
 
     // @ts-ignore
     const { addToCart } = useContext(CartContext);
+
+    // @ts-ignore
+    const { addToLiked, removeFromLiked } = useContext(LikedContext);
 
     const showProducts = () => {
         router.navigate('/product/[productId]')
@@ -63,8 +67,11 @@ export default function ProductCard ({ product }: {product: Product}) {
                 <TouchableOpacity style={styles.addButton} onPress={() => addToCart(product)}>
                     <Ionicons name="add" size={18} color={Colors.neutral[700]} />
                 </TouchableOpacity>
-                <TouchableOpacity>
+                <TouchableOpacity onPress={() => addToLiked(product)}>
                     <Ionicons name="heart" size={32} color="#F04729" />
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => removeFromLiked(product)}>
+                    <Ionicons name="heart-outline" size={32} color={Colors.neutral[700]} />
                 </TouchableOpacity>
             </View>
         </TouchableOpacity>

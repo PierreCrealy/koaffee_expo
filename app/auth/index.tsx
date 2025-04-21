@@ -20,7 +20,7 @@ export default function AuthScreen() {
     const [password, setPassword] = React.useState('');
 
     // @ts-ignore
-    const { user, connectUser } = useContext(UserContext);
+    const { user, token, connectUser } = useContext(UserContext);
 
     const router = useRouter();
 

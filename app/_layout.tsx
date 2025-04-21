@@ -8,8 +8,9 @@ import 'react-native-reanimated';
 import {StyleSheet, View} from "react-native";
 
 import { useColorScheme } from '@/hooks/useColorScheme';
-import {CartProvider} from "@/contexts/CartContext";
-import {UserContext, UserProvider} from "@/contexts/UserContext";
+import { CartProvider } from "@/contexts/CartContext";
+import { UserProvider } from "@/contexts/UserContext";
+import { LikedProvider } from "@/contexts/LikedContext";
 
 import * as SecureStore from "expo-secure-store";
 import * as Notifications from "expo-notifications";
@@ -94,23 +95,25 @@ export default function RootLayout() {
   return (
       <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
         <UserProvider>
-          <CartProvider>
+          <LikedProvider>
+            <CartProvider>
 
-            <View style={styles.containerBubble}>
-              <StructuretBubble />
-              <LikedBubble />
-            </View>
+              <View style={styles.containerBubble}>
+                <StructuretBubble />
+                <LikedBubble />
+              </View>
 
 
-            <Stack screenOptions={{ headerShown: false }}>
+              <Stack screenOptions={{ headerShown: false }}>
 
-              <Stack.Screen name="auth/index" />
-              <Stack.Screen name="+not-found" />
+                <Stack.Screen name="auth/index" />
+                <Stack.Screen name="+not-found" />
 
-            </Stack>
+              </Stack>
 
-            <StatusBar style="auto" />
-          </CartProvider>
+              <StatusBar style="auto" />
+            </CartProvider>
+          </LikedProvider>
         </UserProvider>
     </ThemeProvider>
   );

@@ -19,41 +19,28 @@ import React, {useCallback, useContext, useEffect} from "react";
 import { Product } from "@/entities/Product";
 import {CartContext} from "@/contexts/CartContext";
 import {UserContext} from "@/contexts/UserContext";
+import {LikedContext} from "@/contexts/LikedContext";
 
 export default function LikedIndexScreen() {
 
     const navigation = useNavigation();
 
-    const [likedProducts, setLikedProducts] = React.useState<Product[]>([]);
+    //const [likedProducts, setLikedProducts] = React.useState<Product[]>([]);
     const [loading, setLoading] = React.useState(false);
 
     // @ts-ignore
     const { addToCart, cartProducts } = useContext(CartContext);
 
     // @ts-ignore
-    const { user, token } = useContext(UserContext);
+    const { likedProducts, fetchLikedProducts } = useContext(LikedContext);
 
-    const fetchService = async () => {
-        setLoading(true);
-        await fetch(`https://koaffee-api.pierre-dev-app.fr/api/v1/liked-product/${user.id}/liked`, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`,
-            },
-        })
-            .then((response) => response.json())
-            .then(data => {
-                setLoading(false);
-                setLikedProducts(data.likedProducts);
-            })
-            .catch((e) => console.log('error : ' + e.message));
-    }
+    // @ts-ignore
+    const { user, token } = useContext(UserContext);
 
     useFocusEffect(
         useCallback(() => {
 
-            fetchService();
+            fetchLikedProducts();
 
         }, [user?.id])
     );

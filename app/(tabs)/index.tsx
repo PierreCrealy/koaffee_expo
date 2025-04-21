@@ -16,6 +16,7 @@ import * as SecureStore from "expo-secure-store";
 import OrderProgress from "@/components/OrderProgress";
 import { useFocusEffect, useRouter } from "expo-router";
 import { UserContext } from "@/contexts/UserContext";
+import { LikedContext } from "@/contexts/LikedContext";
 
 import * as Notifications from "expo-notifications";
 import * as Device from 'expo-device';
@@ -35,6 +36,9 @@ export default function HomeScreen() {
 
     // @ts-ignore
     const { user, token } = useContext(UserContext);
+
+    // @ts-ignore
+    const { fetchLikedProducts } = useContext(LikedContext);
 
     const loadLocation = async () => {
         const locationSec = await SecureStore.getItemAsync('location');
@@ -58,6 +62,7 @@ export default function HomeScreen() {
             })
             .catch((e) => console.log('error : ' + e.message));
     };
+
     const getExpoToken = async () => {
         let token;
 
@@ -112,6 +117,8 @@ export default function HomeScreen() {
             }else{
                 loadLocation();
                 latestProgressUserOrder();
+
+                fetchLikedProducts();
             }
 
             // getExpoToken();
