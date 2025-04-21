@@ -7,6 +7,7 @@ import { Colors } from "@/constants/Colors";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { CartContext } from "@/contexts/CartContext";
 import { LikedContext } from "@/contexts/LikedContext";
+import {bool} from "prop-types";
 
 export default function ProductCard ({ product }: {product: Product}) {
 
@@ -17,6 +18,15 @@ export default function ProductCard ({ product }: {product: Product}) {
 
     // @ts-ignore
     const { addToLiked, removeFromLiked } = useContext(LikedContext);
+
+    // @ts-ignore
+    const { likedProducts } = useContext(LikedContext);
+
+    const isInLikedProducts = (product: Product): boolean => {
+
+        return Array.isArray(likedProducts) && likedProducts.some(p => p.id === product.id);
+    }
+
 
     const showProducts = () => {
         router.navigate('/product/[productId]')
@@ -67,12 +77,17 @@ export default function ProductCard ({ product }: {product: Product}) {
                 <TouchableOpacity style={styles.addButton} onPress={() => addToCart(product)}>
                     <Ionicons name="add" size={18} color={Colors.neutral[700]} />
                 </TouchableOpacity>
-                <TouchableOpacity onPress={() => addToLiked(product)}>
-                    <Ionicons name="heart" size={32} color="#F04729" />
-                </TouchableOpacity>
-                <TouchableOpacity onPress={() => removeFromLiked(product)}>
-                    <Ionicons name="heart-outline" size={32} color={Colors.neutral[700]} />
-                </TouchableOpacity>
+
+                { isInLikedProducts(product) ? (
+                    <TouchableOpacity onPress={() => removeFromLiked(product)}>
+                        <Ionicons name="heart" size={32} color="#F04729" />
+                    </TouchableOpacity>
+                ) : (
+                    <TouchableOpacity onPress={() => addToLiked(product)}>
+                        <Ionicons name="heart-outline" size={32} color={Colors.neutral[700]} />
+                    </TouchableOpacity>
+                )}
+
             </View>
         </TouchableOpacity>
     )

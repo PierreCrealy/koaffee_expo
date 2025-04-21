@@ -18,7 +18,8 @@ import React, {useCallback, useContext, useEffect, useState} from "react";
 import { Product } from "@/entities/Product";
 
 import { UserContext } from "@/contexts/UserContext";
-import {useFocusEffect} from "expo-router";
+
+import { useFocusEffect } from "expo-router";
 
 import { slideInFromLeft } from "@/animations/Animations";
 
